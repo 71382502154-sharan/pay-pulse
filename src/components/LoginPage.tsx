@@ -56,12 +56,31 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         }}
       />
 
-      <div className="relative w-full max-w-xl z-10 mx-auto">
+      <div className="relative w-full max-w-xl z-10 mx-auto space-y-5">
+        {/* Web Application Name & Brand Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: -15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="text-center space-y-2"
+        >
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#172554]/90 border border-[#808dc2]/30 text-[#71f8e4] text-xs font-semibold backdrop-blur-md shadow-xs">
+            <span className="w-2 h-2 rounded-full bg-[#71f8e4] animate-pulse"></span>
+            <span>Enterprise Payroll Console</span>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold font-['Plus_Jakarta_Sans'] text-white tracking-tight">
+            PayPulse <span className="text-[#71f8e4]">Enterprise</span>
+          </h1>
+          <p className="text-xs sm:text-sm text-[#808dc2]">
+            Compensation Structuring &amp; Institutional Governance System
+          </p>
+        </motion.div>
+
         {/* Centered Login Card */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.5, delay: 0.05 }}
           className="w-full bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-[#eaedff] p-6 sm:p-8 md:p-10 relative overflow-hidden"
         >
           {/* Top Logo Bar */}
@@ -71,8 +90,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
                 <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
               </div>
               <div>
-                <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-xl text-[#000f3f] tracking-tight flex items-center gap-2">
-                  PayPulse <span className="text-xs font-semibold px-2 py-0.5 rounded-md bg-[#eaedff] text-[#006a63]">Secure Portal</span>
+                <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-lg sm:text-xl text-[#000f3f] tracking-tight flex items-center gap-2">
+                  <span>PayPulse Enterprise</span>
+                  <span className="text-[0.6875rem] font-semibold px-2 py-0.5 rounded-md bg-[#eaedff] text-[#006a63]">Portal</span>
                 </div>
                 <div className="text-xs text-[#45464f]">Identity &amp; Role-Based Access Control</div>
               </div>
