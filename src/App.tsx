@@ -552,7 +552,6 @@ export default function App() {
               currentTab === 'reports' ||
               currentTab === 'allowances-and-deductions' ||
               currentTab === 'reimbursements' ||
-              currentTab === 'loans' ||
               currentTab === 'settings') && (
               <AuxiliaryViews
                 currentTab={currentTab}

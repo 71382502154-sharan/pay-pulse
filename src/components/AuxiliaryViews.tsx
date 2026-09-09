@@ -400,48 +400,6 @@ export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
     );
   }
 
-  if (currentTab === 'loans') {
-    return (
-      <div className="px-6 py-6 space-y-6 max-w-[1600px] mx-auto w-full">
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-[0.6875rem] uppercase tracking-wider text-[#006a63] font-bold font-['Hanken_Grotesk']">
-              Treasury &amp; Advances
-            </span>
-            <h1 className="font-['Plus_Jakarta_Sans'] text-2xl font-bold text-[#131b2e]">
-              Employee Loans &amp; Salary Advances
-            </h1>
-            <p className="text-xs text-[#45464f]">Corporate loan amortization schedules and monthly EMI recovery deductions</p>
-          </div>
-          <button
-            onClick={() => onShowToast('Loan recovery schedule synced to March pay run deductions')}
-            className="px-4 py-2 rounded-lg bg-[#006a63] text-white text-xs font-semibold hover:bg-[#00504a]"
-          >
-            Sync Loan Recoveries
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-white p-5 rounded-xl border border-[#eaedff] shadow-sm">
-            <span className="text-xs text-[#45464f]">Total Active Loan Portfolio</span>
-            <div className="text-2xl font-bold text-[#131b2e] mt-1">₹42,50,000</div>
-            <span className="text-[0.6875rem] text-[#006a63] font-semibold">14 Open Loans</span>
-          </div>
-          <div className="bg-white p-5 rounded-xl border border-[#eaedff] shadow-sm">
-            <span className="text-xs text-[#45464f]">March EMI Deduction</span>
-            <div className="text-2xl font-bold text-[#006a63] mt-1">₹3,45,000</div>
-            <span className="text-[0.6875rem] text-[#006a63] font-semibold">Withheld at source</span>
-          </div>
-          <div className="bg-white p-5 rounded-xl border border-[#eaedff] shadow-sm">
-            <span className="text-xs text-[#45464f]">Restructured Advances</span>
-            <div className="text-2xl font-bold text-[#ba1a1a] mt-1">3 Accounts</div>
-            <span className="text-[0.6875rem] text-[#ba1a1a] font-semibold">Cleared via Discrepancy Modal</span>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   if (currentTab === 'settings') {
     return (
       <div className="px-6 py-6 space-y-6 max-w-[1600px] mx-auto w-full">

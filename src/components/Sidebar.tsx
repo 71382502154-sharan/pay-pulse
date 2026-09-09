@@ -229,19 +229,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="material-symbols-outlined text-[1.25rem] shrink-0">receipt_long</span>
               {!isCollapsed && <span>Reimbursements</span>}
             </button>
-
-            <button
-              onClick={() => onSelectTab('loans')}
-              title={isCollapsed ? 'Loans' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'loans'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">account_balance</span>
-              {!isCollapsed && <span>Loans</span>}
-            </button>
           </nav>
 
           {/* Financial & Compliance Section */}

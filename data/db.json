@@ -191,7 +191,7 @@
       "department": "Project Management",
       "confidence": 99,
       "matchReason": "Institutional LDAP identity match.",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "name-2",
@@ -200,7 +200,7 @@
       "department": "Design & Frontend",
       "confidence": 98,
       "matchReason": "Uppercase naming format reconciled with PAN/ID.",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "name-3",
@@ -209,7 +209,7 @@
       "department": "Backend & Database",
       "confidence": 96,
       "matchReason": "Repository commit alias mapped to roster name.",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "name-4",
@@ -218,7 +218,7 @@
       "department": "AI & Intelligence",
       "confidence": 98,
       "matchReason": "Single sign-on alias resolved to formal payroll name.",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "name-5",
@@ -227,7 +227,7 @@
       "department": "Engineering & Integration",
       "confidence": 99,
       "matchReason": "Full capital payroll name normalized to title casing.",
-      "status": "pending"
+      "status": "approved"
     },
     {
       "id": "name-6",
@@ -236,7 +236,7 @@
       "department": "Engineering & Architecture",
       "confidence": 97,
       "matchReason": "System architect handle linked to employee record.",
-      "status": "pending"
+      "status": "approved"
     }
   ],
   "discrepancies": [

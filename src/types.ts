@@ -7,7 +7,6 @@ export type NavigationTab =
   | 'salary-structure'
   | 'allowances-and-deductions'
   | 'reimbursements'
-  | 'loans'
   | 'payslips'
   | 'reports'
   | 'naming-standardization'
