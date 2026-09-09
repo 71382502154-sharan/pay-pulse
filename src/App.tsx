@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { NavigationTab, EmployeeRow, ApprovalItem, MilestoneEvent, NamingAliasItem, DiscrepancyEmployee, NotificationItem, UserProfile } from './types';
+import { NavigationTab, EmployeeRow, ApprovalItem, MilestoneEvent, DiscrepancyEmployee, NotificationItem, UserProfile } from './types';
 import {
   INITIAL_EMPLOYEES,
   INITIAL_APPROVALS,
   INITIAL_MILESTONES,
-  INITIAL_NAMING_ITEMS,
   INITIAL_DISCREPANCIES,
 } from './data/payrollData';
 import { Sidebar } from './components/Sidebar';
@@ -18,7 +17,6 @@ import { ApprovalsView } from './components/ApprovalsView';
 import { PayslipsView } from './components/PayslipsView';
 import { AuxiliaryViews } from './components/AuxiliaryViews';
 import { NotificationsView } from './components/NotificationsView';
-import { NamingStandardizationModal } from './components/NamingStandardizationModal';
 import { DiscrepancyModal } from './components/DiscrepancyModal';
 import { AddAllowanceModal } from './components/AddAllowanceModal';
 import { AddEmployeeModal } from './components/AddEmployeeModal';
@@ -39,14 +37,14 @@ const INITIAL_NOTIFICATIONS: NotificationItem[] = [
   },
   {
     id: 'notif-2',
-    title: 'Naming Standardization Intelligence Audit Completed',
-    description: '18 inconsistent casing profiles, duplicate aliases, and abbreviated titles detected prior to bank file generation.',
-    impact: 'Bank NEFT/RTGS direct deposit batch may face clearance delays.',
-    category: 'critical',
+    title: 'Direct Escrow Disbursement Batch Formatted',
+    description: '256-bit encrypted direct-deposit batch generated with automated negative net pay locks.',
+    impact: 'Escrow clearing verification scheduled for today.',
+    category: 'fiduciary',
     timestamp: '25 mins ago',
     read: false,
-    actionLabel: 'Review in Naming Center',
-    actionType: 'naming',
+    actionLabel: 'View Pay Runs',
+    actionType: 'payrun',
   },
   {
     id: 'notif-3',
@@ -164,7 +162,6 @@ export default function App() {
   const [employees, setEmployees] = useState<EmployeeRow[]>(INITIAL_EMPLOYEES);
   const [approvals, setApprovals] = useState<ApprovalItem[]>(INITIAL_APPROVALS);
   const [milestones, setMilestones] = useState<MilestoneEvent[]>(INITIAL_MILESTONES);
-  const [namingAliases, setNamingAliases] = useState<NamingAliasItem[]>(INITIAL_NAMING_ITEMS);
   const [discrepancies, setDiscrepancies] = useState<DiscrepancyEmployee[]>(INITIAL_DISCREPANCIES);
   const [notifications, setNotifications] = useState<NotificationItem[]>(INITIAL_NOTIFICATIONS);
 
@@ -194,7 +191,6 @@ export default function App() {
   const unreadNotificationsCount = notifications.filter((n) => !n.read).length;
 
   // Modals state
-  const [isNamingModalOpen, setIsNamingModalOpen] = useState(false);
   const [isDiscrepancyModalOpen, setIsDiscrepancyModalOpen] = useState(false);
   const [isAddAllowanceModalOpen, setIsAddAllowanceModalOpen] = useState(false);
   const [isAddEmployeeModalOpen, setIsAddEmployeeModalOpen] = useState(false);
@@ -226,7 +222,6 @@ export default function App() {
           setEmployees(result.data.employees);
           setApprovals(result.data.approvals);
           setMilestones(result.data.milestones);
-          setNamingAliases(result.data.namingAliases);
           setDiscrepancies(result.data.discrepancies);
           setIsBackendConnected(true);
         }
@@ -282,32 +277,6 @@ export default function App() {
       await fetch('/api/approvals/batch-approve', { method: 'POST' });
     } catch (e) {
       console.error('Failed to sync batch approval to backend:', e);
-    }
-  };
-
-  const handleAcceptNamingItem = async (id: string) => {
-    setNamingAliases((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, status: 'approved' } : item))
-    );
-
-    try {
-      await fetch(`/api/naming-aliases/${id}/action`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action: 'approved' }),
-      });
-    } catch (e) {
-      console.error('Failed to sync naming item to backend:', e);
-    }
-  };
-
-  const handleAcceptAllNaming = async () => {
-    setNamingAliases((prev) => prev.map((item) => ({ ...item, status: 'approved' })));
-
-    try {
-      await fetch('/api/naming-aliases/batch-accept', { method: 'POST' });
-    } catch (e) {
-      console.error('Failed to sync batch naming acceptance to backend:', e);
     }
   };
 
@@ -426,13 +395,7 @@ export default function App() {
       {/* Navigation Sidebar */}
       <Sidebar
         currentTab={currentTab}
-        onSelectTab={(tab) => {
-          if (tab === 'naming-standardization') {
-            setIsNamingModalOpen(true);
-          } else {
-            setCurrentTab(tab);
-          }
-        }}
+        onSelectTab={(tab) => setCurrentTab(tab)}
         isCollapsed={isCollapsed}
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
         pendingApprovalsCount={approvals.filter((a) => a.status === 'pending').length}
@@ -444,13 +407,7 @@ export default function App() {
       {/* Top Header */}
       <Header
         currentTab={currentTab}
-        onSelectTab={(tab) => {
-          if (tab === 'naming-standardization') {
-            setIsNamingModalOpen(true);
-          } else {
-            setCurrentTab(tab);
-          }
-        }}
+        onSelectTab={(tab) => setCurrentTab(tab)}
         onOpenNewPayRun={() => setCurrentTab('pay-runs')}
         onOpenAddEmployee={() => setIsAddEmployeeModalOpen(true)}
         searchQuery={searchQuery}
@@ -485,7 +442,6 @@ export default function App() {
               <DashboardView
                 onNavigateToPayRun={() => setCurrentTab('pay-runs')}
                 onNavigateToTab={(tab) => setCurrentTab(tab)}
-                onOpenNamingCenter={() => setIsNamingModalOpen(true)}
                 onOpenAddEmployee={() => setIsAddEmployeeModalOpen(true)}
                 approvals={approvals}
                 onApproveItem={handleApproveItem}
@@ -541,7 +497,6 @@ export default function App() {
                 onNavigateToTab={(tab) => setCurrentTab(tab)}
                 onNavigateToPayRun={() => setCurrentTab('pay-runs')}
                 onOpenDiscrepancies={() => setIsDiscrepancyModalOpen(true)}
-                onOpenNamingCenter={() => setIsNamingModalOpen(true)}
                 onShowToast={showToast}
                 employees={employees}
               />
@@ -567,14 +522,6 @@ export default function App() {
       </main>
 
       {/* Modals */}
-      <NamingStandardizationModal
-        isOpen={isNamingModalOpen}
-        onClose={() => setIsNamingModalOpen(false)}
-        items={namingAliases}
-        onAcceptItem={handleAcceptNamingItem}
-        onAcceptAll={handleAcceptAllNaming}
-        onShowToast={showToast}
-      />
 
       <DiscrepancyModal
         isOpen={isDiscrepancyModalOpen}

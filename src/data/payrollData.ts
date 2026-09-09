@@ -1,4 +1,4 @@
-import { ApprovalItem, DiscrepancyEmployee, EmployeeRow, MilestoneEvent, NamingAliasItem } from '../types';
+import { ApprovalItem, DiscrepancyEmployee, EmployeeRow, MilestoneEvent } from '../types';
 
 export const INITIAL_EMPLOYEES: EmployeeRow[] = [
   {
@@ -187,63 +187,6 @@ export const INITIAL_MILESTONES: MilestoneEvent[] = [
   },
 ];
 
-export const INITIAL_NAMING_ITEMS: NamingAliasItem[] = [
-  {
-    id: 'name-1',
-    rawInput: 'sashmitha.sm',
-    suggestedStandard: 'Sashmitha S M',
-    department: 'Project Management',
-    confidence: 99,
-    matchReason: 'Institutional LDAP identity match.',
-    status: 'pending',
-  },
-  {
-    id: 'name-2',
-    rawInput: 'SATHANA G',
-    suggestedStandard: 'Sathana G',
-    department: 'Design & Frontend',
-    confidence: 98,
-    matchReason: 'Uppercase naming format reconciled with PAN/ID.',
-    status: 'pending',
-  },
-  {
-    id: 'name-3',
-    rawInput: 'seashora_r_dev',
-    suggestedStandard: 'Seashora R',
-    department: 'Backend & Database',
-    confidence: 96,
-    matchReason: 'Repository commit alias mapped to roster name.',
-    status: 'pending',
-  },
-  {
-    id: 'name-4',
-    rawInput: 'selvamanikandan.s',
-    suggestedStandard: 'Selvamanikandan S',
-    department: 'AI & Intelligence',
-    confidence: 98,
-    matchReason: 'Single sign-on alias resolved to formal payroll name.',
-    status: 'pending',
-  },
-  {
-    id: 'name-5',
-    rawInput: 'SETHU RAMAN V',
-    suggestedStandard: 'Sethu Raman V',
-    department: 'Engineering & Integration',
-    confidence: 99,
-    matchReason: 'Full capital payroll name normalized to title casing.',
-    status: 'pending',
-  },
-  {
-    id: 'name-6',
-    rawInput: 'sharan_arch',
-    suggestedStandard: 'Sharan R',
-    department: 'Engineering & Architecture',
-    confidence: 97,
-    matchReason: 'System architect handle linked to employee record.',
-    status: 'pending',
-  },
-];
-
 export const INITIAL_DISCREPANCIES: DiscrepancyEmployee[] = [
   {
     id: 'disc-1',
@@ -304,7 +247,7 @@ export const INITIAL_DISCREPANCIES: DiscrepancyEmployee[] = [
     netPay: 154000,
     resolutionOptions: [
       'Verify AI/ML Project Allowance',
-      'Review Naming Intelligence Bonus',
+      'Review AI Incentive Bonus',
       'Approve AI Development Incentive',
     ],
     resolved: false,

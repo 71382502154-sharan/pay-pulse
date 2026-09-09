@@ -265,26 +265,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <span className="material-symbols-outlined text-[1.25rem] shrink-0">bar_chart</span>
               {!isCollapsed && <span>Reports</span>}
             </button>
-
-            <button
-              onClick={() => onSelectTab('naming-standardization')}
-              title={isCollapsed ? 'Naming Standardization' : undefined}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'naming-standardization'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[1.25rem] shrink-0">rule_folder</span>
-                {!isCollapsed && <span>Naming Standardization</span>}
-              </div>
-              {!isCollapsed && (
-                <span className="px-1.5 py-0.5 rounded bg-[#006a63] text-white font-bold text-[0.625rem] tracking-wider uppercase">
-                  New
-                </span>
-              )}
-            </button>
           </nav>
 
           {/* System Section */}

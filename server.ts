@@ -8,14 +8,12 @@ import {
   INITIAL_EMPLOYEES,
   INITIAL_APPROVALS,
   INITIAL_MILESTONES,
-  INITIAL_NAMING_ITEMS,
   INITIAL_DISCREPANCIES,
 } from './src/data/payrollData';
 import {
   EmployeeRow,
   ApprovalItem,
   MilestoneEvent,
-  NamingAliasItem,
   DiscrepancyEmployee,
 } from './src/types';
 
@@ -39,7 +37,6 @@ interface DatabaseSchema {
   employees: EmployeeRow[];
   approvals: ApprovalItem[];
   milestones: MilestoneEvent[];
-  namingAliases: NamingAliasItem[];
   discrepancies: DiscrepancyEmployee[];
 }
 
@@ -48,7 +45,6 @@ let db: DatabaseSchema = {
   employees: [...INITIAL_EMPLOYEES],
   approvals: [...INITIAL_APPROVALS],
   milestones: [...INITIAL_MILESTONES],
-  namingAliases: [...INITIAL_NAMING_ITEMS],
   discrepancies: [...INITIAL_DISCREPANCIES],
 };
 
@@ -65,7 +61,6 @@ function loadDatabase() {
         employees: parsed.employees || [...INITIAL_EMPLOYEES],
         approvals: parsed.approvals || [...INITIAL_APPROVALS],
         milestones: parsed.milestones || [...INITIAL_MILESTONES],
-        namingAliases: parsed.namingAliases || [...INITIAL_NAMING_ITEMS],
         discrepancies: parsed.discrepancies || [...INITIAL_DISCREPANCIES],
       };
       console.log(`[PayPulse API] Loaded persistent data from ${DB_FILE}`);
@@ -219,37 +214,6 @@ app.post('/api/approvals/batch-approve', (_req: Request, res: Response) => {
   db.approvals = db.approvals.map((a) => ({ ...a, status: 'approved' }));
   saveDatabase();
   res.json({ success: true, count: db.approvals.length, data: db.approvals });
-});
-
-// ==========================================
-// NAMING ALIASES API
-// ==========================================
-app.get('/api/naming-aliases', (_req: Request, res: Response) => {
-  res.json({ success: true, data: db.namingAliases });
-});
-
-app.post('/api/naming-aliases/:id/action', (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { action } = req.body;
-  const index = db.namingAliases.findIndex((n) => n.id === id);
-
-  if (index === -1) {
-    return res.status(404).json({ success: false, message: 'Alias item not found' });
-  }
-
-  db.namingAliases[index] = {
-    ...db.namingAliases[index],
-    status: action === 'ignored' ? 'ignored' : 'approved',
-  };
-
-  saveDatabase();
-  res.json({ success: true, data: db.namingAliases[index] });
-});
-
-app.post('/api/naming-aliases/batch-accept', (_req: Request, res: Response) => {
-  db.namingAliases = db.namingAliases.map((n) => ({ ...n, status: 'approved' }));
-  saveDatabase();
-  res.json({ success: true, count: db.namingAliases.length, data: db.namingAliases });
 });
 
 // ==========================================

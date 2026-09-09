@@ -221,8 +221,8 @@ export const Header: React.FC<HeaderProps> = ({
                     }}
                     className="p-2 rounded-lg bg-[#faf8ff] hover:bg-[#f2f3ff] transition-colors cursor-pointer"
                   >
-                    <div className="font-semibold text-[#131b2e]">18 Naming Inconsistencies Flagged</div>
-                    <div className="text-[#45464f] text-[0.6875rem]">AI audit detected format anomalies in banking records.</div>
+                    <div className="font-semibold text-[#131b2e]">Direct Escrow Disbursement Batch Formatted</div>
+                    <div className="text-[#45464f] text-[0.6875rem]">256-bit encrypted bank direct-deposit batch prepared.</div>
                     <div className="text-[#767680] text-[0.625rem] mt-1">25 mins ago</div>
                   </div>
                   <div

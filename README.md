@@ -12,7 +12,7 @@ PayPulse Enterprise is a modern, responsive web application designed for enterpr
 - ⚙️ **Pay Run Execution**: Streamlined payroll processing engine with automated rule checking, discrepancy detection, and execution logs.
 - 👥 **Employee Directory**: Comprehensive employee records, salary tier management, allowance configurations, and CSV/batch imports.
 - 📑 **Payslip Generation**: Detailed itemized payslips with breakdown of basic pay, allowances, tax deductions, and EPF/statutory contributions.
-- 🛡️ **Compliance & Rule Engine**: Automated validation checks, naming standardizations, discrepancy flagging, and audit trail logging.
+- 🛡️ **Compliance & Rule Engine**: Automated validation checks, discrepancy flagging, and audit trail logging.
 - ✍️ **Approvals Workflow**: Multi-level authorization workflows for off-cycle adjustments, bonus requests, and final sign-offs.
 - 🤖 **Gemini AI Integration**: Server-side AI assistance for payroll analytics, discrepancy resolution, and intelligent reporting.
 

@@ -6,7 +6,6 @@ import { INITIAL_EMPLOYEES } from '../data/payrollData';
 interface DashboardViewProps {
   onNavigateToPayRun: () => void;
   onNavigateToTab: (tab: NavigationTab) => void;
-  onOpenNamingCenter: () => void;
   onOpenAddEmployee: () => void;
   approvals: ApprovalItem[];
   onApproveItem: (id: string) => void;
@@ -19,7 +18,6 @@ interface DashboardViewProps {
 export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigateToPayRun,
   onNavigateToTab,
-  onOpenNamingCenter,
   onOpenAddEmployee,
   approvals,
   onApproveItem,
@@ -256,57 +254,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span>Statutory pass</span>
             </div>
             <span>EPFO / TDS ready</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Highlight Feature: Naming Standardization Intelligence Widget */}
-      <div className="rounded-2xl bg-gradient-to-r from-[#172554] to-[#000f3f] text-white p-6 shadow-md border border-[#172554] relative overflow-hidden">
-        <div className="absolute -right-12 -top-12 w-60 h-60 rounded-full bg-[#006a63]/25 blur-2xl pointer-events-none"></div>
-
-        <div className="relative z-10 flex flex-col xl:flex-row xl:items-center justify-between gap-5">
-          <div className="space-y-2 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-[#006a63]/30 text-[#99efe5] text-xs font-semibold">
-              <span className="material-symbols-outlined text-[1rem]">auto_fix_high</span>
-              <span>AI Compliance Audit</span>
-            </div>
-            <h2 className="font-['Plus_Jakarta_Sans'] text-xl font-bold text-white">
-              Naming Standardization Intelligence
-            </h2>
-            <p className="font-['Hanken_Grotesk'] text-sm text-[#808dc2] leading-relaxed">
-              Data Quality Health: <strong className="text-white">94.2% Standardized</strong>. 18 duplicate aliases and inconsistent casing profiles detected prior to bank file generation.
-            </p>
-          </div>
-
-          {/* Sample preview chips */}
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-            <div className="bg-[#000f3f]/60 backdrop-blur-md rounded-xl p-3 flex flex-col gap-2 border border-[#808dc2]/20 shadow-sm">
-              <div className="flex items-center gap-2 text-xs">
-                <span className="line-through text-[#808dc2]">SHARAN R</span>
-                <span className="material-symbols-outlined text-[0.875rem] text-[#4fdbc8]">arrow_forward</span>
-                <span className="text-white font-semibold">Sharan R.</span>
-                <span className="px-1.5 py-0.5 rounded bg-[#006a63]/40 text-[#99efe5] text-[0.625rem] font-bold">
-                  98% Match
-                </span>
-              </div>
-              <div className="flex items-center gap-2 text-xs">
-                <span className="line-through text-[#808dc2]">dr. ananya roy</span>
-                <span className="material-symbols-outlined text-[0.875rem] text-[#4fdbc8]">arrow_forward</span>
-                <span className="text-white font-semibold">Dr. Ananya Roy</span>
-                <span className="px-1.5 py-0.5 rounded bg-[#006a63]/40 text-[#99efe5] text-[0.625rem] font-bold">
-                  100% Match
-                </span>
-              </div>
-            </div>
-
-            <button
-              onClick={onOpenNamingCenter}
-              type="button"
-              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-[#006a63] text-white hover:bg-[#00504a] transition-all text-xs font-['Plus_Jakarta_Sans'] font-semibold shrink-0 shadow-sm active:scale-95"
-            >
-              <span>Review in Naming Center</span>
-              <span className="material-symbols-outlined text-[1.125rem]">north_east</span>
-            </button>
           </div>
         </div>
       </div>

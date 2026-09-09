@@ -13,7 +13,6 @@ interface NotificationsViewProps {
   onNavigateToTab: (tab: NavigationTab) => void;
   onNavigateToPayRun: () => void;
   onOpenDiscrepancies: () => void;
-  onOpenNamingCenter: () => void;
   onShowToast: (msg: string) => void;
   employees?: EmployeeRow[];
 }
@@ -28,7 +27,6 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
   onNavigateToTab,
   onNavigateToPayRun,
   onOpenDiscrepancies,
-  onOpenNamingCenter,
   onShowToast,
   employees = [],
 }) => {
@@ -46,9 +44,6 @@ export const NotificationsView: React.FC<NotificationsViewProps> = ({
     switch (n.actionType) {
       case 'discrepancies':
         onOpenDiscrepancies();
-        break;
-      case 'naming':
-        onOpenNamingCenter();
         break;
       case 'approvals':
         onNavigateToTab('approvals');

@@ -9,7 +9,6 @@ export type NavigationTab =
   | 'reimbursements'
   | 'payslips'
   | 'reports'
-  | 'naming-standardization'
   | 'notifications'
   | 'settings';
 
@@ -57,16 +56,6 @@ export interface MilestoneEvent {
   dotColor: 'primary' | 'secondary' | 'surface-tint';
 }
 
-export interface NamingAliasItem {
-  id: string;
-  rawInput: string;
-  suggestedStandard: string;
-  department: string;
-  confidence: number;
-  matchReason: string;
-  status: 'pending' | 'approved' | 'ignored';
-}
-
 export interface DiscrepancyEmployee {
   id: string;
   name: string;
@@ -89,7 +78,7 @@ export interface NotificationItem {
   timestamp: string;
   read: boolean;
   actionLabel?: string;
-  actionType?: 'discrepancies' | 'naming' | 'approvals' | 'attendance' | 'payrun' | 'reports';
+  actionType?: 'discrepancies' | 'approvals' | 'attendance' | 'payrun' | 'reports';
 }
 
 export interface UserProfile {
