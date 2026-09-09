@@ -260,6 +260,10 @@ html.dark,
 }
 
 /* Text Colors */
+.dark .text-\[\#000f3f\] {
+  color: #ffffff !important;
+}
+
 .dark .text-\[\#131b2e\] {
   color: #f8fafc !important;
 }

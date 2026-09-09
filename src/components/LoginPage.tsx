@@ -85,16 +85,21 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
         >
           {/* Top Logo Bar */}
           <div className="flex items-center justify-between pb-6 border-b border-[#eaedff]">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-[#000f3f] text-[#71f8e4] flex items-center justify-center shadow-md">
+            <div className="flex items-center gap-3.5">
+              <div className="w-12 h-12 rounded-xl bg-[#000f3f] text-[#71f8e4] flex items-center justify-center shadow-md ring-2 ring-[#006a63]/30 shrink-0">
                 <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
               </div>
               <div>
-                <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-lg sm:text-xl text-[#000f3f] tracking-tight flex items-center gap-2">
-                  <span>PayPulse Enterprise</span>
-                  <span className="text-[0.6875rem] font-semibold px-2 py-0.5 rounded-md bg-[#eaedff] text-[#006a63]">Portal</span>
+                <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-xl sm:text-2xl tracking-tight flex items-center gap-2 flex-wrap">
+                  <span className="text-[#000f3f] dark:text-white font-black drop-shadow-xs">PayPulse</span>
+                  <span className="text-[#006a63] dark:text-[#71f8e4]">Enterprise</span>
+                  <span className="text-[0.6875rem] font-bold px-2 py-0.5 rounded-md bg-[#eaedff] text-[#006a63] border border-[#006a63]/20">
+                    Portal
+                  </span>
                 </div>
-                <div className="text-xs text-[#45464f]">Identity &amp; Role-Based Access Control</div>
+                <div className="text-xs text-[#45464f] dark:text-[#94a3b8] font-medium mt-0.5">
+                  Identity &amp; Role-Based Access Control
+                </div>
               </div>
             </div>
 
