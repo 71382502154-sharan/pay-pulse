@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { NavigationTab } from '../types';
+import React, { useState, useRef, useEffect } from 'react';
+import { NavigationTab, UserProfile } from '../types';
+import { getInitials } from '../utils/userUtils';
 
 interface HeaderProps {
   currentTab: NavigationTab;
@@ -13,6 +14,8 @@ interface HeaderProps {
   isCollapsed: boolean;
   isBackendConnected?: boolean;
   unreadNotificationsCount?: number;
+  user?: UserProfile;
+  onLogout?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -27,9 +30,23 @@ export const Header: React.FC<HeaderProps> = ({
   isCollapsed,
   isBackendConnected = false,
   unreadNotificationsCount = 3,
+  user,
+  onLogout,
 }) => {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(e.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <header
@@ -236,19 +253,99 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
 
-        {/* User Avatar & Name */}
-        <div className="flex items-center gap-2.5 pl-1">
-          <div className="w-8 h-8 rounded-full bg-[#000f3f] text-white flex items-center justify-center font-bold text-xs cursor-pointer ring-2 ring-[#006a63]/30">
-            PS
-          </div>
-          <div className="hidden xl:flex flex-col text-left">
-            <span className="font-['Plus_Jakarta_Sans'] font-semibold text-xs text-[#131b2e] leading-tight">
-              Priya Sharma
+        {/* User Avatar & Name Profile Area */}
+        <div className="relative pl-1" ref={profileMenuRef}>
+          <button
+            type="button"
+            onClick={() => setShowProfileMenu((prev) => !prev)}
+            className="flex items-center gap-2.5 p-1 rounded-xl hover:bg-[#f2f3ff] transition-all cursor-pointer focus:outline-none focus:ring-2 focus:ring-[#006a63]/20"
+            aria-label="User profile menu"
+          >
+            <div 
+              className="w-8 h-8 rounded-full text-white flex items-center justify-center font-bold text-xs shrink-0 ring-2 ring-[#006a63]/30 shadow-xs"
+              style={{ backgroundColor: user?.avatarBg || '#000f3f' }}
+            >
+              {getInitials(user?.name)}
+            </div>
+            <div className="hidden xl:flex flex-col text-left">
+              <span className="font-['Plus_Jakarta_Sans'] font-semibold text-xs text-[#131b2e] leading-tight max-w-[130px] truncate">
+                {user?.name || 'User Profile'}
+              </span>
+              <span className="font-['Hanken_Grotesk'] text-[0.6875rem] text-[#45464f] leading-tight max-w-[130px] truncate">
+                {user?.role || 'Admin'}
+              </span>
+            </div>
+            <span className="material-symbols-outlined text-[1rem] text-[#767680] hidden xl:inline-block transition-transform duration-200" style={{ transform: showProfileMenu ? 'rotate(180deg)' : 'none' }}>
+              expand_more
             </span>
-            <span className="font-['Hanken_Grotesk'] text-[0.6875rem] text-[#45464f] leading-tight">
-              Admin
-            </span>
-          </div>
+          </button>
+
+          {/* Profile Dropdown Popup */}
+          {showProfileMenu && (
+            <div className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-[#eaedff] p-3 z-50 animate-in fade-in zoom-in-95 duration-150">
+              <div className="flex items-center gap-3 p-2 bg-[#f2f3ff] rounded-xl border border-[#eaedff]">
+                <div 
+                  className="w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-sm shrink-0 shadow-sm"
+                  style={{ backgroundColor: user?.avatarBg || '#000f3f' }}
+                >
+                  {getInitials(user?.name)}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="font-['Plus_Jakarta_Sans'] font-bold text-xs text-[#131b2e] truncate">
+                    {user?.name || 'Authorized User'}
+                  </div>
+                  <div className="text-[0.6875rem] text-[#45464f] truncate">
+                    {user?.email || 'user@paypulse.corp'}
+                  </div>
+                  <div className="mt-0.5 inline-block text-[0.625rem] font-semibold text-[#006a63] bg-[#99efe5]/40 px-1.5 py-0.5 rounded">
+                    {user?.role || 'Admin'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-2 space-y-1 text-xs">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    onSelectTab('settings');
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#131b2e] hover:bg-[#faf8ff] transition-colors text-left font-medium"
+                >
+                  <span className="material-symbols-outlined text-base text-[#006a63]">manage_accounts</span>
+                  <span>Profile &amp; Settings</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProfileMenu(false);
+                    onSelectTab('notifications');
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#131b2e] hover:bg-[#faf8ff] transition-colors text-left font-medium"
+                >
+                  <span className="material-symbols-outlined text-base text-[#45464f]">notifications</span>
+                  <span>Notification Center</span>
+                </button>
+
+                {onLogout && (
+                  <div className="pt-1.5 border-t border-[#eaedff] mt-1">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        onLogout();
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[#ba1a1a] hover:bg-[#ffdad6]/40 transition-colors text-left font-semibold"
+                    >
+                      <span className="material-symbols-outlined text-base text-[#ba1a1a]">logout</span>
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

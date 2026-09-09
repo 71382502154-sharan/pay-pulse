@@ -1,13 +1,16 @@
-import React from 'react';
-import { NavigationTab, EmployeeRow } from '../types';
+import React, { useState } from 'react';
+import { NavigationTab, EmployeeRow, UserProfile } from '../types';
 import { downloadStatutoryReport } from '../utils/downloadUtils';
 import { INITIAL_EMPLOYEES } from '../data/payrollData';
+import { getInitials } from '../utils/userUtils';
 
 interface AuxiliaryViewsProps {
   currentTab: NavigationTab;
   onShowToast: (msg: string) => void;
   onNavigateToPayRun: () => void;
   employees?: EmployeeRow[];
+  user?: UserProfile;
+  onUpdateUser?: (updated: UserProfile) => void;
 }
 
 export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
@@ -15,7 +18,13 @@ export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
   onShowToast,
   onNavigateToPayRun,
   employees = INITIAL_EMPLOYEES,
+  user,
+  onUpdateUser,
 }) => {
+  const [profileName, setProfileName] = useState(user?.name || '');
+  const [profileEmail, setProfileEmail] = useState(user?.email || '');
+  const [profileRole, setProfileRole] = useState(user?.role || '');
+  const [profileDept, setProfileDept] = useState(user?.department || '');
   if (currentTab === 'salary-structure') {
     return (
       <div className="px-6 py-6 space-y-6 max-w-[1600px] mx-auto w-full">
@@ -452,6 +461,92 @@ export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
           >
             Save Configuration
           </button>
+        </div>
+
+        {/* Active User Profile Identity Card */}
+        <div className="bg-white p-6 rounded-xl border border-[#eaedff] shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-[#eaedff] pb-3">
+            <div className="flex items-center gap-3">
+              <div 
+                className="w-10 h-10 rounded-full text-white flex items-center justify-center font-bold text-sm shadow-xs"
+                style={{ backgroundColor: user?.avatarBg || '#000f3f' }}
+              >
+                {getInitials(profileName || user?.name)}
+              </div>
+              <div>
+                <h2 className="font-bold text-sm text-[#131b2e]">Active User Profile</h2>
+                <p className="text-[0.6875rem] text-[#45464f]">Identity and role credentials displayed across PayPulse headers &amp; audit trails</p>
+              </div>
+            </div>
+            <span className="px-2.5 py-0.5 rounded-full bg-[#99efe5]/40 text-[#006f67] text-[0.6875rem] font-bold">
+              Active Session
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div>
+              <label className="block text-[#45464f] font-semibold mb-1">Display Full Name</label>
+              <input
+                type="text"
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+                placeholder="Enter your name"
+                className="w-full px-3 py-2 rounded-lg bg-[#f2f3ff] border border-[#eaedff] font-semibold text-[#131b2e] focus:bg-white focus:outline-none focus:border-[#006a63]"
+              />
+            </div>
+            <div>
+              <label className="block text-[#45464f] font-semibold mb-1">Work Email</label>
+              <input
+                type="email"
+                value={profileEmail}
+                onChange={(e) => setProfileEmail(e.target.value)}
+                placeholder="name@enterprise.corp"
+                className="w-full px-3 py-2 rounded-lg bg-[#f2f3ff] border border-[#eaedff] text-[#131b2e] focus:bg-white focus:outline-none focus:border-[#006a63]"
+              />
+            </div>
+            <div>
+              <label className="block text-[#45464f] font-semibold mb-1">Assigned Role</label>
+              <input
+                type="text"
+                value={profileRole}
+                onChange={(e) => setProfileRole(e.target.value)}
+                placeholder="e.g., HR Payroll Director"
+                className="w-full px-3 py-2 rounded-lg bg-[#f2f3ff] border border-[#eaedff] text-[#131b2e] focus:bg-white focus:outline-none focus:border-[#006a63]"
+              />
+            </div>
+            <div>
+              <label className="block text-[#45464f] font-semibold mb-1">Department</label>
+              <input
+                type="text"
+                value={profileDept}
+                onChange={(e) => setProfileDept(e.target.value)}
+                placeholder="e.g., People Operations"
+                className="w-full px-3 py-2 rounded-lg bg-[#f2f3ff] border border-[#eaedff] text-[#131b2e] focus:bg-white focus:outline-none focus:border-[#006a63]"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (onUpdateUser && profileName.trim()) {
+                  onUpdateUser({
+                    name: profileName.trim(),
+                    email: profileEmail.trim(),
+                    role: profileRole.trim() || 'Payroll Specialist',
+                    department: profileDept.trim() || 'Operations',
+                    avatarBg: user?.avatarBg || '#000f3f',
+                  });
+                  onShowToast('User profile updated successfully');
+                }
+              }}
+              className="px-4 py-2 rounded-lg bg-[#000f3f] hover:bg-[#172554] text-white text-xs font-semibold transition-all cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5"
+            >
+              <span className="material-symbols-outlined text-base">check_circle</span>
+              <span>Update Profile Info</span>
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

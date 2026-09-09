@@ -92,3 +92,12 @@ export interface NotificationItem {
   actionLabel?: string;
   actionType?: 'discrepancies' | 'naming' | 'approvals' | 'attendance' | 'payrun' | 'reports';
 }
+
+export interface UserProfile {
+  name: string;
+  email: string;
+  role: string;
+  department?: string;
+  avatarBg?: string;
+}
+

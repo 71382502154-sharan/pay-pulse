@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { NavigationTab, EmployeeRow, ApprovalItem, MilestoneEvent, NamingAliasItem, DiscrepancyEmployee, NotificationItem } from './types';
+import { NavigationTab, EmployeeRow, ApprovalItem, MilestoneEvent, NamingAliasItem, DiscrepancyEmployee, NotificationItem, UserProfile } from './types';
 import {
   INITIAL_EMPLOYEES,
   INITIAL_APPROVALS,
@@ -10,6 +10,7 @@ import {
 } from './data/payrollData';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
+import { LoginPage } from './components/LoginPage';
 import { DashboardView } from './components/DashboardView';
 import { PayRunExecutionView } from './components/PayRunExecutionView';
 import { EmployeesView } from './components/EmployeesView';
@@ -106,6 +107,43 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [isBackendConnected, setIsBackendConnected] = useState<boolean>(false);
+
+  // Authentication & Profile State
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    try {
+      const saved = localStorage.getItem('paypulse_auth_user');
+      if (saved) {
+        return JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error('Failed to parse saved user:', e);
+    }
+    return null;
+  });
+
+  const handleLogin = (user: UserProfile) => {
+    setCurrentUser(user);
+    try {
+      localStorage.setItem('paypulse_auth_user', JSON.stringify(user));
+    } catch {}
+    setToastMessage(`Welcome back, ${user.name}!`);
+  };
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    try {
+      localStorage.removeItem('paypulse_auth_user');
+    } catch {}
+    setToastMessage('Signed out of PayPulse console');
+  };
+
+  const handleUpdateUser = (updated: UserProfile) => {
+    setCurrentUser(updated);
+    try {
+      localStorage.setItem('paypulse_auth_user', JSON.stringify(updated));
+    } catch {}
+    setToastMessage('User profile updated');
+  };
 
   // Sync dark class on document root and persist preference
   useEffect(() => {
@@ -345,6 +383,28 @@ export default function App() {
     }
   };
 
+  if (!currentUser) {
+    return (
+      <>
+        <LoginPage onLogin={handleLogin} />
+        {toastMessage && (
+          <div className="fixed bottom-6 right-6 z-50 flex items-center gap-2.5 px-4 py-3 rounded-xl bg-[#131b2e] text-white shadow-2xl border border-[#eaedff]/20 animate-in fade-in slide-in-from-bottom-2">
+            <span className="material-symbols-outlined text-[1.25rem] text-[#71f8e4]">
+              info
+            </span>
+            <span className="text-xs font-semibold">{toastMessage}</span>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="ml-2 text-[#767680] hover:text-white"
+            >
+              <span className="material-symbols-outlined text-[1rem]">close</span>
+            </button>
+          </div>
+        )}
+      </>
+    );
+  }
+
   return (
     <div className={`min-h-screen bg-[#faf8ff] text-[#131b2e] font-['Hanken_Grotesk'] ${isDark ? 'dark' : ''}`}>
       {/* Toast Notification Notification Banner */}
@@ -377,6 +437,8 @@ export default function App() {
         onToggleCollapse={() => setIsCollapsed(!isCollapsed)}
         pendingApprovalsCount={approvals.filter((a) => a.status === 'pending').length}
         unreadNotificationsCount={unreadNotificationsCount}
+        user={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* Top Header */}
@@ -401,6 +463,8 @@ export default function App() {
         isCollapsed={isCollapsed}
         isBackendConnected={isBackendConnected}
         unreadNotificationsCount={unreadNotificationsCount}
+        user={currentUser}
+        onLogout={handleLogout}
       />
 
       {/* Main Content Area */}
@@ -495,6 +559,8 @@ export default function App() {
                 onShowToast={showToast}
                 onNavigateToPayRun={() => setCurrentTab('pay-runs')}
                 employees={employees}
+                user={currentUser}
+                onUpdateUser={handleUpdateUser}
               />
             )}
           </motion.div>

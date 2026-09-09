@@ -1,5 +1,6 @@
 import React from 'react';
-import { NavigationTab } from '../types';
+import { NavigationTab, UserProfile } from '../types';
+import { getInitials } from '../utils/userUtils';
 
 interface SidebarProps {
   currentTab: NavigationTab;
@@ -8,6 +9,8 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   pendingApprovalsCount: number;
   unreadNotificationsCount?: number;
+  user?: UserProfile;
+  onLogout?: () => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -17,6 +20,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onToggleCollapse,
   pendingApprovalsCount,
   unreadNotificationsCount = 3,
+  user,
+  onLogout,
 }) => {
   return (
     <aside
@@ -347,25 +352,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-3 shrink-0 bg-[#172554]/40 border-t border-[#172554]/50">
         <div className="bg-[#172554] rounded-xl p-2.5 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="w-9 h-9 rounded-full bg-[#006a63] text-white flex items-center justify-center font-bold text-xs shrink-0 ring-2 ring-[#006a63]/50">
-              PS
+            <div 
+              className="w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-xs shrink-0 ring-2 ring-[#006a63]/50 shadow-xs"
+              style={{ backgroundColor: user?.avatarBg || '#006a63' }}
+            >
+              {getInitials(user?.name)}
             </div>
             {!isCollapsed && (
               <div className="min-w-0 flex-1">
-                <div className="font-['Plus_Jakarta_Sans'] font-semibold text-white text-sm truncate">
-                  Priya Sharma
+                <div className="font-['Plus_Jakarta_Sans'] font-semibold text-white text-sm truncate" title={user?.name || 'User Profile'}>
+                  {user?.name || 'User Profile'}
                 </div>
-                <div className="font-['Hanken_Grotesk'] text-[0.6875rem] text-[#808dc2] truncate">
-                  HR Payroll Director
+                <div className="font-['Hanken_Grotesk'] text-[0.6875rem] text-[#808dc2] truncate" title={user?.role || 'Admin'}>
+                  {user?.role || 'HR Payroll Director'}
                 </div>
               </div>
             )}
           </div>
-          {!isCollapsed && (
+          {!isCollapsed && onLogout && (
             <button
+              onClick={onLogout}
               aria-label="Sign Out"
               title="Sign Out"
-              className="text-[#808dc2] hover:text-white p-1 transition-colors shrink-0 rounded-lg hover:bg-[#000f3f]/50"
+              className="text-[#808dc2] hover:text-white p-1 transition-colors shrink-0 rounded-lg hover:bg-[#000f3f]/50 cursor-pointer"
               type="button"
             >
               <span className="material-symbols-outlined text-[1.25rem]">logout</span>
