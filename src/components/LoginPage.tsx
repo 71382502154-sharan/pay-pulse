@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
+import { Eye, EyeOff } from 'lucide-react';
 import { UserProfile } from '../types';
 import { getInitials } from '../utils/userUtils';
 
@@ -68,7 +69,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
     setEmail(preset.email);
     setRole(preset.role);
     setDepartment(preset.department || 'Operations');
-    setPassword('••••••••••••');
+    setPassword('PayPulse@2025');
     setErrorMessage('');
   };
 
@@ -291,28 +292,63 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-[#131b2e] mb-1.5 font-['Plus_Jakarta_Sans']">
-                Access Security PIN / Password
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label 
+                  htmlFor="login-password-field" 
+                  className="block text-xs font-bold text-[#131b2e] font-['Plus_Jakarta_Sans']"
+                >
+                  Access Security PIN / Password
+                </label>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowPassword((prev) => !prev);
+                  }}
+                  className="text-[0.6875rem] text-[#006a63] font-semibold hover:underline cursor-pointer flex items-center gap-1 focus:outline-none"
+                >
+                  {showPassword ? (
+                    <>
+                      <EyeOff className="w-3.5 h-3.5" />
+                      <span>Hide</span>
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Show</span>
+                    </>
+                  )}
+                </button>
+              </div>
               <div className="relative">
-                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#767680] text-lg">
+                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#767680] text-lg pointer-events-none">
                   lock
                 </span>
                 <input
+                  id="login-password-field"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your security PIN or password"
-                  className="w-full pl-10 pr-11 py-2.5 rounded-xl bg-[#f2f3ff] text-sm text-[#131b2e] placeholder:text-[#767680] border border-[#eaedff] focus:border-[#006a63] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006a63]/20 transition-all font-medium"
+                  autoComplete="current-password"
+                  className="w-full pl-10 pr-12 py-2.5 rounded-xl bg-[#f2f3ff] text-sm text-[#131b2e] placeholder:text-[#767680] border border-[#eaedff] focus:border-[#006a63] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006a63]/20 transition-all font-medium"
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[#767680] hover:text-[#131b2e] transition-colors"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowPassword((prev) => !prev);
+                  }}
+                  title={showPassword ? 'Hide password' : 'Show password'}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 p-2 text-[#767680] hover:text-[#131b2e] hover:bg-[#eaedff] rounded-lg transition-all cursor-pointer flex items-center justify-center focus:outline-none"
                 >
-                  <span className="material-symbols-outlined text-lg">
-                    {showPassword ? 'visibility_off' : 'visibility'}
-                  </span>
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4 text-[#006a63]" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-[#767680]" />
+                  )}
                 </button>
               </div>
             </div>
