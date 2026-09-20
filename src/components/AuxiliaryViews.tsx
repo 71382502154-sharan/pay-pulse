@@ -1,8 +1,26 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — AUXILIARY CONSOLE VIEWS
+ * ============================================================================
+ * Hosts modular sub-views for specialized console workflows:
+ * - 'salary-structure': Grade-wise CTC breakdown & statutory wage bands
+ * - 'attendance': Biometric punch logs, shift rosters, and unpaid LOP tracking
+ * - 'allowances-and-deductions': Statutory and discretionary rules matrix
+ * - 'reimbursements': Expense claim verification and receipt auditing
+ * - 'reports': Statutory EPFO, ESIC, Form 24Q, and compliance exports
+ * - 'settings': Organization settings, profile config, and API integrations
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { NavigationTab, EmployeeRow, UserProfile } from '../types';
 import { downloadStatutoryReport } from '../utils/downloadUtils';
 import { INITIAL_EMPLOYEES } from '../data/payrollData';
 import { getInitials } from '../utils/userUtils';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface AuxiliaryViewsProps {
   currentTab: NavigationTab;
@@ -12,6 +30,10 @@ interface AuxiliaryViewsProps {
   user?: UserProfile;
   onUpdateUser?: (updated: UserProfile) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT ROUTING & SUB-VIEWS                                           */
+/* ========================================================================== */
 
 export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
   currentTab,
@@ -25,6 +47,10 @@ export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
   const [profileEmail, setProfileEmail] = useState(user?.email || '');
   const [profileRole, setProfileRole] = useState(user?.role || '');
   const [profileDept, setProfileDept] = useState(user?.department || '');
+
+  /* ------------------------------------------------------------------------ */
+  /* TAB: SALARY STRUCTURE & STATUTORY BANDS                                  */
+  /* ------------------------------------------------------------------------ */
   if (currentTab === 'salary-structure') {
     return (
       <div className="px-6 py-6 space-y-6 max-w-[1600px] mx-auto w-full">
@@ -458,7 +484,7 @@ export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
                 type="email"
                 value={profileEmail}
                 onChange={(e) => setProfileEmail(e.target.value)}
-                placeholder="name@enterprise.corp"
+                placeholder="name@paypulse.corp"
                 className="w-full px-3 py-2 rounded-lg bg-[#f2f3ff] border border-[#eaedff] text-[#131b2e] focus:bg-white focus:outline-none focus:border-[#006a63]"
               />
             </div>
@@ -518,7 +544,7 @@ export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
                 <input
                   type="text"
                   readOnly
-                  value="PayPulse Enterprise Technologies Pvt. Ltd."
+                  value="PayPulse Technologies Pvt. Ltd."
                   className="w-full px-3 py-2 rounded-lg bg-[#f2f3ff] border border-[#eaedff] font-semibold text-[#131b2e]"
                 />
               </div>

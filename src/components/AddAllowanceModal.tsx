@@ -1,6 +1,19 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — ADD ALLOWANCE MODAL
+ * ============================================================================
+ * Dialog allowing operators to assign ad-hoc allowances, discretionary bonuses,
+ * or retention incentives to individual employees within the active cycle.
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { EmployeeRow } from '../types';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface AddAllowanceModalProps {
   isOpen: boolean;
@@ -9,6 +22,10 @@ interface AddAllowanceModalProps {
   onAddAllowance: (empId: string, amount: number, category: string) => void;
   onShowToast: (msg: string) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION                                                */
+/* ========================================================================== */
 
 export const AddAllowanceModal: React.FC<AddAllowanceModalProps> = ({
   isOpen,

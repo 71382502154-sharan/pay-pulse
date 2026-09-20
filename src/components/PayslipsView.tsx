@@ -1,12 +1,30 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — PAYSLIPS & DISBURSEMENT DOCUMENTS VIEW
+ * ============================================================================
+ * Institutional payslip generator rendering compliant earnings & deductions
+ * statements, real-time PF/TDS/PT withholdings, and single-click HTML/PDF download.
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { EmployeeRow } from '../types';
 import { downloadPayslipHTML } from '../utils/downloadUtils';
+import { PayPulseLogo } from './PayPulseLogo';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface PayslipsViewProps {
   employees: EmployeeRow[];
   onShowToast: (msg: string) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION                                                */
+/* ========================================================================== */
 
 export const PayslipsView: React.FC<PayslipsViewProps> = ({ employees, onShowToast }) => {
   const [selectedEmp, setSelectedEmp] = useState<EmployeeRow>(employees[0]);
@@ -89,12 +107,11 @@ export const PayslipsView: React.FC<PayslipsViewProps> = ({ employees, onShowToa
           >
           <div className="flex items-start justify-between pb-6 border-b border-[#eaedff]">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#000f3f] flex items-center justify-center text-white">
-                <span className="material-symbols-outlined text-[1.5rem]">payments</span>
-              </div>
+              <PayPulseLogo size="md" variant="badge" />
               <div>
+
                 <h2 className="font-['Plus_Jakarta_Sans'] font-bold text-lg text-[#131b2e]">
-                  PAYPULSE ENTERPRISE TECHNOLOGIES PVT. LTD.
+                  PAYPULSE TECHNOLOGIES PVT. LTD.
                 </h2>
                 <p className="text-xs text-[#45464f]">CIN: U72200KA2020PTC139821 • Bengaluru, Karnataka</p>
               </div>

@@ -1,7 +1,21 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — EMPLOYEES ROSTER VIEW
+ * ============================================================================
+ * Comprehensive workforce directory supporting departmental filtering,
+ * instant live search, CSV exporting, detailed employee profile modals,
+ * and quick integration into pending pay cycles.
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { EmployeeRow } from '../types';
 import { exportEmployeesToCSV } from '../utils/downloadUtils';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface EmployeesViewProps {
   employees: EmployeeRow[];
@@ -9,6 +23,10 @@ interface EmployeesViewProps {
   onSelectEmployeeForPayRun?: (empId: string) => void;
   onShowToast: (msg: string) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION & FILTERING                                    */
+/* ========================================================================== */
 
 export const EmployeesView: React.FC<EmployeesViewProps> = ({
   employees,

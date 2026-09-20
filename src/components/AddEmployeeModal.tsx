@@ -1,6 +1,19 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — ADD EMPLOYEE MODAL
+ * ============================================================================
+ * Form dialog allowing administrators to enroll new staff into the workforce
+ * roster with immediate wage breakdown, department, and designation assignment.
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { EmployeeRow } from '../types';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface AddEmployeeModalProps {
   isOpen: boolean;
@@ -8,6 +21,10 @@ interface AddEmployeeModalProps {
   onAddEmployee: (employee: EmployeeRow) => void;
   onShowToast: (msg: string) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION                                                */
+/* ========================================================================== */
 
 export const AddEmployeeModal: React.FC<AddEmployeeModalProps> = ({
   isOpen,

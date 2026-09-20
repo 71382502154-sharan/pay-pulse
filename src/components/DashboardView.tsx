@@ -1,7 +1,21 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — EXECUTIVE DASHBOARD VIEW
+ * ============================================================================
+ * Primary institutional control center providing real-time compensation KPIs,
+ * pending cycle approval reviews, single-click batch authorizations, and
+ * cryptographically tracked payroll audit milestones.
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
-import { ApprovalItem, MilestoneEvent, NavigationTab, EmployeeRow } from '../types';
+import { ApprovalItem, MilestoneEvent, NavigationTab, EmployeeRow, UserProfile } from '../types';
 import { exportReconciliationLedger } from '../utils/downloadUtils';
 import { INITIAL_EMPLOYEES } from '../data/payrollData';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface DashboardViewProps {
   onNavigateToPayRun: () => void;
@@ -13,7 +27,12 @@ interface DashboardViewProps {
   milestones: MilestoneEvent[];
   onShowToast: (msg: string) => void;
   employees?: EmployeeRow[];
+  user?: UserProfile;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT DEFINITION & LOGIC                                            */
+/* ========================================================================== */
 
 export const DashboardView: React.FC<DashboardViewProps> = ({
   onNavigateToPayRun,
@@ -25,10 +44,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   milestones,
   onShowToast,
   employees = INITIAL_EMPLOYEES,
+  user,
 }) => {
   const [previewApproval, setPreviewApproval] = useState<ApprovalItem | null>(null);
 
   const pendingApprovals = approvals.filter((a) => a.status === 'pending');
+
+  // Dynamic time-based greeting & personalized user name
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 17) return 'Good afternoon';
+    return 'Good evening';
+  };
+
+  const displayName = user?.name ? user.name.split(' ')[0] : 'Director';
 
   return (
     <div className="px-6 py-6 space-y-6 max-w-[1600px] mx-auto w-full">
@@ -38,27 +68,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="absolute right-32 -bottom-20 w-80 h-80 rounded-full bg-gradient-to-tr from-[#172554]/20 via-[#808dc2]/15 to-transparent blur-2xl pointer-events-none animate-ambient-glow" style={{ animationDelay: '-5s' }}></div>
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-          <div className="space-y-2">
-            <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#99efe5]/40 text-[#006f67] font-['Hanken_Grotesk'] text-xs font-semibold shadow-xs">
-                <span className="w-2 h-2 rounded-full bg-[#006a63] animate-pulse"></span>
-                Active Cycle: 01 Mar – 31 Mar, 2025
-              </span>
-              <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#ffdad6]/60 text-[#93000a] font-['Hanken_Grotesk'] text-xs font-semibold animate-pulse-halo">
-                <span className="material-symbols-outlined text-[0.875rem]">schedule</span>
-                Cycle Closes in 4 Days
-              </span>
-            </div>
-
-            <div className="pt-1">
-              <h1 className="font-['Plus_Jakarta_Sans'] text-2xl lg:text-[1.75rem] text-[#131b2e] font-bold tracking-tight">
-                Good morning, Priya
-              </h1>
-              <p className="font-['Hanken_Grotesk'] text-sm text-[#45464f] max-w-2xl mt-0.5 leading-relaxed">
-                Fiduciary review for March 2025 cycle. {pendingApprovals.length} director sign-offs pending; statutory remittance reconciliation ready for submission.
-              </p>
-            </div>
+          <div>
+            <h1 className="font-['Plus_Jakarta_Sans'] text-2xl lg:text-[1.75rem] text-[#131b2e] font-bold tracking-tight">
+              {getGreeting()}, {displayName}
+            </h1>
           </div>
+
 
           <div className="flex items-center gap-3 flex-wrap shrink-0">
             <button
@@ -119,7 +134,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <circle cx="160" cy="4" r="2.5" fill="#006a63" />
             </svg>
           </div>
-          <div className="pt-2 flex items-center justify-between text-xs text-[#45464f] border-t border-[#eaedff]/60">
+          <div className="pt-2 flex items-center justify-between text-xs text-[#45464f] font-medium border-t border-[#eaedff]/60">
             <div className="inline-flex items-center gap-1 text-[#006a63] font-semibold">
               <span className="material-symbols-outlined text-[0.95rem]">trending_up</span>
               <span>+100% verified</span>
@@ -161,7 +176,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <circle cx="160" cy="5" r="2.5" fill="#172554" />
             </svg>
           </div>
-          <div className="pt-2 flex items-center justify-between text-xs text-[#45464f] border-t border-[#eaedff]/60">
+          <div className="pt-2 flex items-center justify-between text-xs text-[#45464f] font-medium border-t border-[#eaedff]/60">
             <div className="inline-flex items-center gap-1 text-[#006a63] font-semibold">
               <span className="material-symbols-outlined text-[0.95rem]">insights</span>
               <span>March Cycle</span>
@@ -292,7 +307,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           <div className="overflow-x-auto border border-[#eaedff] rounded-xl">
             <table className="w-full text-left">
               <thead>
-                <tr className="bg-[#f2f3ff] text-[#45464f] text-[0.6875rem] uppercase tracking-wider font-semibold">
+                <tr className="bg-[#f2f3ff] text-[#131b2e] text-[0.6875rem] uppercase tracking-wider font-bold">
                   <th className="py-3 px-4">Item / Employee</th>
                   <th className="py-3 px-4">Category</th>
                   <th className="py-3 px-4 text-right">Adjustment</th>
@@ -307,7 +322,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                     <tr
                       key={appr.id}
                       className={`hover:bg-[#faf8ff] transition-colors ${
-                        !isPending ? 'opacity-60 bg-[#f2f3ff]/30' : ''
+                        !isPending ? 'bg-[#f2f3ff]/40' : ''
                       }`}
                     >
                       <td className="py-3 px-4">
@@ -316,15 +331,15 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                             {appr.initials}
                           </div>
                           <div>
-                            <div className="font-semibold text-[#131b2e]">{appr.employeeName}</div>
-                            <div className="text-[0.6875rem] text-[#45464f]">
+                            <div className="font-bold text-[#131b2e]">{appr.employeeName}</div>
+                            <div className="text-[0.6875rem] text-[#45464f] font-medium">
                               {appr.employeeCode} • {appr.designation}
                             </div>
                           </div>
                         </div>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded bg-[#f2f3ff] text-xs text-[#45464f] font-medium border border-[#eaedff]">
+                        <span className="px-2 py-0.5 rounded bg-[#f2f3ff] text-xs text-[#131b2e] font-semibold border border-[#eaedff]">
                           {appr.category}
                         </span>
                       </td>
@@ -337,7 +352,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                           ? `-₹${Math.abs(appr.adjustment).toLocaleString('en-IN')}`
                           : `+₹${appr.adjustment.toLocaleString('en-IN')}`}
                       </td>
-                      <td className="py-3 px-4 text-[#45464f]">{appr.submittedBy}</td>
+                      <td className="py-3 px-4 text-[#45464f] font-medium">{appr.submittedBy}</td>
                       <td className="py-3 px-4 text-right">
                         {isPending ? (
                           <div className="inline-flex items-center gap-1.5">
@@ -395,9 +410,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   }`}
                 ></div>
                 <div>
-                  <div className="text-xs font-semibold text-[#131b2e]">{m.title}</div>
-                  <p className="text-[0.6875rem] text-[#45464f] mt-0.5">{m.description}</p>
-                  <span className="text-[0.625rem] text-[#767680] mt-1 inline-block">{m.timestamp}</span>
+                  <div className="text-xs font-bold text-[#131b2e]">{m.title}</div>
+                  <p className="text-[0.6875rem] text-[#45464f] font-medium mt-0.5">{m.description}</p>
+                  <span className="text-[0.625rem] text-[#767680] font-semibold mt-1 inline-block">{m.timestamp}</span>
                 </div>
               </div>
             ))}
@@ -407,7 +422,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <button
               onClick={() => onNavigateToTab('reports')}
               type="button"
-              className="text-[#006a63] hover:text-[#00504a] text-xs font-semibold inline-flex items-center gap-1 transition-colors"
+              className="text-[#006a63] hover:text-[#00504a] text-xs font-bold inline-flex items-center gap-1 transition-colors"
             >
               <span>View Full Compliance Archive</span>
               <span className="material-symbols-outlined text-[1rem]">arrow_forward</span>
@@ -424,10 +439,10 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <span className="material-symbols-outlined text-[1.35rem]">bolt</span>
             </div>
             <div>
-              <h3 className="font-['Plus_Jakarta_Sans'] text-sm font-semibold text-[#131b2e]">
+              <h3 className="font-['Plus_Jakarta_Sans'] text-sm font-bold text-[#131b2e]">
                 Instant Executive Actions
               </h3>
-              <p className="text-xs text-[#45464f]">One-click operational shortcuts for current billing window</p>
+              <p className="text-xs text-[#45464f] font-medium">One-click operational shortcuts for current billing window</p>
             </div>
           </div>
 

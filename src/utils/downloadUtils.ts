@@ -1,3 +1,12 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — EXPORT & REPORT DOWNLOAD UTILITIES
+ * ============================================================================
+ * Client-side file generation engines producing compliant CSV ledgers,
+ * printable HTML/PDF payslips, EPFO/ESIC text challans, and batch upload templates.
+ * ============================================================================
+ */
+
 import { EmployeeRow } from '../types';
 
 /**
@@ -305,7 +314,7 @@ export function downloadPayslipHTML(employee: EmployeeRow) {
 <body>
   <div class="header">
     <div>
-      <div class="logo">PayPulse Enterprise</div>
+      <div class="logo">PayPulse</div>
       <div style="font-size: 12px; color: #767680;">Official Corporate Salary Disbursement Statement</div>
     </div>
     <div style="text-align: right;">
@@ -373,8 +382,9 @@ export function downloadPayslipHTML(employee: EmployeeRow) {
 
   <div class="footer">
     This is a computer-generated institutional payslip and requires no physical signature.<br>
-    PayPulse Enterprise System • Reference #${employee.code}-202503 • Generated on ${new Date().toLocaleDateString('en-GB')}
+    PayPulse System • Reference #${employee.code}-202503 • Generated on ${new Date().toLocaleDateString('en-GB')}
   </div>
+
 
   <div class="no-print" style="margin-top: 24px; text-align: center;">
     <button onclick="window.print()" style="padding: 10px 20px; background: #000f3f; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">

@@ -1,6 +1,19 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — DISCREPANCY RECONCILIATION MODAL
+ * ============================================================================
+ * Interactive resolution dialog presenting employees flagged by the rule engine
+ * for statutory anomalies or negative net compensation.
+ * ============================================================================
+ */
+
 import React from 'react';
 import { motion } from 'motion/react';
 import { DiscrepancyEmployee } from '../types';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface DiscrepancyModalProps {
   isOpen: boolean;
@@ -9,6 +22,10 @@ interface DiscrepancyModalProps {
   onResolveDiscrepancy: (id: string, selectedOption: string) => void;
   onShowToast: (msg: string) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION                                                */
+/* ========================================================================== */
 
 export const DiscrepancyModal: React.FC<DiscrepancyModalProps> = ({
   isOpen,

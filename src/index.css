@@ -1,24 +1,28 @@
 @import "tailwindcss";
+@import "./landing/landing.css";
+
+@variant dark (&:where(.dark, .dark *));
 
 @theme {
   --color-primary: #000f3f;
   --color-primary-container: #172554;
   --color-on-primary: #ffffff;
-  --color-on-primary-container: #808dc2;
-  --color-secondary: #006a63;
+  --color-on-primary-container: #001c6e;
+  --color-secondary: #007a72;
   --color-secondary-container: #99efe5;
   --color-on-secondary-container: #006f67;
-  --color-surface: #faf8ff;
+  --color-surface: var(--bg-surface);
+  --color-background: var(--bg-primary);
   --color-surface-dim: #d2d9f4;
   --color-surface-container-lowest: #ffffff;
   --color-surface-container-low: #f2f3ff;
   --color-surface-container: #eaedff;
   --color-surface-container-high: #e2e7ff;
   --color-surface-container-highest: #dae2fd;
-  --color-on-surface: #131b2e;
-  --color-on-surface-variant: #45464f;
-  --color-outline: #767680;
-  --color-outline-variant: #c6c5d0;
+  --color-on-surface: #0a0f1d;
+  --color-on-surface-variant: #1e293b;
+  --color-outline: #334155;
+  --color-outline-variant: #94a3b8;
   --color-surface-tint: #4f5c8e;
   --color-error: #ba1a1a;
   --color-error-container: #ffdad6;
@@ -149,6 +153,296 @@
   animation: pulseSubtle 3s ease-in-out infinite;
 }
 
+/* Radar ping for live status indicators */
+@keyframes radarPing {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(79, 219, 200, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(79, 219, 200, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(79, 219, 200, 0);
+  }
+}
+
+.animate-radar-ping {
+  animation: radarPing 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Radiant pulsating border glow for high-priority elements */
+@keyframes borderGlowPulse {
+  0%, 100% {
+    border-color: rgba(0, 106, 99, 0.35);
+    box-shadow: 0 0 12px rgba(0, 106, 99, 0.12);
+  }
+  50% {
+    border-color: rgba(79, 219, 200, 0.85);
+    box-shadow: 0 0 20px rgba(79, 219, 200, 0.35);
+  }
+}
+
+.animate-border-glow {
+  animation: borderGlowPulse 2.8s ease-in-out infinite;
+}
+
+/* Smooth spring modal entrance */
+@keyframes modalPopIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.94) translateY(14px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-modal-pop {
+  animation: modalPopIn 0.26s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Luminous touch light burst expansion */
+@keyframes touchLightPulse {
+  0% {
+    transform: translate(-50%, -50%) scale(0.08);
+    opacity: 1;
+    filter: brightness(2.2) drop-shadow(0 0 16px rgba(255, 255, 255, 1));
+  }
+  45% {
+    opacity: 0.95;
+    filter: brightness(1.8) drop-shadow(0 0 24px rgba(113, 248, 228, 0.95));
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0;
+    filter: brightness(1) drop-shadow(0 0 0 rgba(255, 255, 255, 0));
+  }
+}
+
+/* ===================================================
+   BUTTON ILLUMINATION & TOUCH ANIMATIONS SYSTEM
+   =================================================== */
+
+button:not(.absolute):not(.btn-input-icon),
+[role="button"]:not(.absolute):not(.btn-input-icon),
+.btn-interactive:not(.absolute):not(.btn-input-icon) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  white-space: nowrap;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.24s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.2s ease,
+              background-color 0.2s ease,
+              border-color 0.2s ease,
+              color 0.2s ease;
+  will-change: transform, box-shadow, filter;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+/* Explicit absolute positioned buttons (e.g. badges, input controls) */
+button.absolute,
+[role="button"].absolute {
+  position: absolute !important;
+}
+
+/* Input Accessory / Toggle Buttons (e.g. Password Eye Icon, Search Clear) */
+.btn-input-icon,
+button.btn-input-icon {
+  position: absolute !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  overflow: visible !important;
+  isolation: auto !important;
+  padding: 0.25rem !important;
+  min-width: unset !important;
+  min-height: unset !important;
+  border-radius: 0.5rem;
+}
+
+.btn-input-icon:hover,
+button.btn-input-icon:hover {
+  background: rgba(0, 106, 99, 0.08) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: translateY(-50%) scale(1.1) !important;
+}
+
+.btn-input-icon:active,
+button.btn-input-icon:active {
+  background: rgba(0, 106, 99, 0.15) !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: translateY(-50%) scale(0.92) !important;
+}
+
+.btn-input-icon::before,
+button.btn-input-icon::before,
+.btn-input-icon::after,
+button.btn-input-icon::after {
+  display: none !important;
+}
+
+/* Button Hover: elevation, brightening and soft ambient aura */
+button:not(.btn-input-icon):hover:not(:disabled),
+[role="button"]:not(.btn-input-icon):hover:not([aria-disabled="true"]),
+.btn-interactive:not(.btn-input-icon):hover {
+  transform: translateY(-2px);
+  filter: brightness(1.12) contrast(1.02);
+  box-shadow: 0 8px 20px -3px rgba(0, 15, 63, 0.18), 0 0 18px -1px rgba(0, 106, 99, 0.28);
+}
+
+
+/* Button Touch / Active: instantaneous luminous flash & tactile spring press */
+button:active:not(:disabled),
+[role="button"]:active:not([aria-disabled="true"]),
+.btn-interactive:active,
+button.is-touching-light {
+  transform: translateY(1px) scale(0.966) !important;
+  filter: brightness(1.28) contrast(1.08) !important;
+  box-shadow: 0 0 28px 4px rgba(113, 248, 228, 0.65), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Internal icon bounce and subtle glow on button hover/touch */
+button:hover:not(:disabled) .material-symbols-outlined,
+button:hover:not(:disabled) svg,
+button:hover:not(:disabled) [data-icon] {
+  transform: scale(1.14);
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.75));
+  transition: transform 0.24s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+}
+
+button:active:not(:disabled) .material-symbols-outlined,
+button:active:not(:disabled) svg,
+button:active:not(:disabled) [data-icon] {
+  transform: scale(0.94);
+  filter: drop-shadow(0 0 12px rgba(255, 255, 255, 1));
+}
+
+/* Specular light sheen beam sweeping across button on hover and touch */
+button:not(.no-sheen)::before,
+[role="button"]:not(.no-sheen)::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -140%;
+  width: 65%;
+  height: 220%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 15%,
+    rgba(255, 255, 255, 0.45) 50%,
+    rgba(255, 255, 255, 0.04) 85%,
+    transparent 100%
+  );
+  transform: rotate(24deg);
+  pointer-events: none;
+  z-index: 5;
+  transition: none;
+}
+
+button:not(.no-sheen):hover::before,
+button:not(.no-sheen):active::before,
+[role="button"]:not(.no-sheen):hover::before {
+  left: 200%;
+  transition: left 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Radial light burst at user's touch or click coordinate */
+.touch-light-burst {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0.1);
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(113, 248, 228, 0.8) 25%,
+    rgba(0, 245, 212, 0.5) 50%,
+    rgba(0, 106, 99, 0.2) 72%,
+    transparent 88%
+  );
+  animation: touchLightPulse 0.55s cubic-bezier(0.12, 0.8, 0.32, 1) forwards;
+  z-index: 25;
+  mix-blend-mode: screen;
+}
+
+/* Specialized Brightening Color Illuminations */
+/* Primary Navy Buttons */
+.btn-glow-primary,
+button.bg-\[\#000f3f\] {
+  box-shadow: 0 4px 14px -2px rgba(0, 15, 63, 0.35);
+}
+
+button.bg-\[\#000f3f\]:hover,
+.btn-glow-primary:hover {
+  box-shadow: 0 0 26px 3px rgba(99, 102, 241, 0.52), 0 8px 22px -4px rgba(0, 15, 63, 0.5) !important;
+  filter: brightness(1.15) !important;
+}
+
+button.bg-\[\#000f3f\]:active,
+.btn-glow-primary:active {
+  box-shadow: 0 0 36px 8px rgba(129, 140, 248, 0.75), 0 2px 8px rgba(0, 15, 63, 0.6) !important;
+}
+
+/* Teal Accent Action Buttons */
+.btn-glow-teal,
+button.bg-\[\#006a63\] {
+  box-shadow: 0 4px 14px -2px rgba(0, 106, 99, 0.35);
+}
+
+button.bg-\[\#006a63\]:hover,
+.btn-glow-teal:hover {
+  box-shadow: 0 0 28px 4px rgba(79, 219, 200, 0.65), 0 8px 22px -4px rgba(0, 106, 99, 0.45) !important;
+  filter: brightness(1.14) !important;
+}
+
+button.bg-\[\#006a63\]:active,
+.btn-glow-teal:active {
+  box-shadow: 0 0 40px 10px rgba(113, 248, 228, 0.88), 0 2px 8px rgba(0, 106, 99, 0.5) !important;
+}
+
+/* Danger Alert Buttons */
+.btn-glow-danger,
+button.bg-\[\#ba1a1a\] {
+  box-shadow: 0 4px 14px -2px rgba(186, 26, 26, 0.35);
+}
+
+button.bg-\[\#ba1a1a\]:hover,
+.btn-glow-danger:hover {
+  box-shadow: 0 0 28px 4px rgba(239, 68, 68, 0.6), 0 8px 22px -4px rgba(186, 26, 26, 0.45) !important;
+  filter: brightness(1.15) !important;
+}
+
+button.bg-\[\#ba1a1a\]:active,
+.btn-glow-danger:active {
+  box-shadow: 0 0 38px 9px rgba(252, 165, 165, 0.85), 0 2px 8px rgba(186, 26, 26, 0.5) !important;
+}
+
+
+/* Light & Elevated Container Buttons */
+button.bg-\[\#eaedff\]:hover,
+button.bg-\[\#f2f3ff\]:hover,
+button.bg-white:hover {
+  box-shadow: 0 0 20px 2px rgba(99, 102, 241, 0.28), 0 4px 14px -2px rgba(0, 15, 63, 0.1) !important;
+}
+
+button.bg-\[\#eaedff\]:active,
+button.bg-\[\#f2f3ff\]:active,
+button.bg-white:active {
+  box-shadow: 0 0 28px 5px rgba(99, 102, 241, 0.45), 0 2px 6px rgba(0, 15, 63, 0.15) !important;
+}
+
+
 /* Glassmorphism and Card Interactions */
 .glass-card {
   background: rgba(255, 255, 255, 0.85);
@@ -213,6 +507,206 @@
 }
 
 /* ===================================================
+   LIGHT THEME SYSTEM - DEEP DARK & CRISP TEXT CALIBRATION
+   Eliminates all faded/light text in light mode across full project
+   =================================================== */
+html:not(.dark),
+:root[data-theme='light'],
+html.light,
+.light {
+  color-scheme: light;
+}
+
+/* Base Light Mode Text Default */
+html:not(.dark) body,
+:root[data-theme='light'] body,
+html.light body,
+.light body {
+  color: #0f172a;
+}
+
+/* Light mode primary text: deepest black-navy */
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#131b2e\],
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#020617\],
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#0a0f1d\],
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#000f3f\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#131b2e\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#020617\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#0a0f1d\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#000f3f\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#131b2e\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#020617\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#0a0f1d\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#000f3f\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#131b2e\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#020617\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#0a0f1d\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#000f3f\] {
+  color: #020617 !important;
+}
+
+/* Light mode secondary text: rich dark charcoal slate-900 */
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#45464f\],
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#0f172a\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#45464f\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#0f172a\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#45464f\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#0f172a\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#45464f\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#0f172a\] {
+  color: #0f172a !important;
+}
+
+/* Light mode muted text: dark slate-800 */
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#767680\],
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#1e293b\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#767680\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#1e293b\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#767680\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#1e293b\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#767680\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#1e293b\] {
+  color: #1e293b !important;
+}
+
+/* Light mode accent text on content surfaces: deep corporate navy */
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#808dc2\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#808dc2\],
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#808dc2\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#808dc2\] {
+  color: #001c6e !important;
+}
+
+/* Light mode dim & caption text: dark slate-700 */
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#94a3b8\],
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#334155\],
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#475569\],
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-slate-400,
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-slate-500,
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-gray-400,
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-gray-500,
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#94a3b8\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#334155\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#475569\],
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-slate-400,
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-slate-500,
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-gray-400,
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-gray-500,
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#94a3b8\],
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .text-\[\#94a3b8\] {
+  color: #334155 !important;
+}
+
+html:not(.dark) .text-\[\#006a63\],
+:root[data-theme='light'] .text-\[\#006a63\],
+html.light .text-\[\#006a63\],
+.light .text-\[\#006a63\] {
+  color: #007a72 !important;
+}
+
+/* Light mode stat numerals */
+html:not(.dark) :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .tabular-nums:not(.text-\[\#ba1a1a\]):not(.text-\[\#93000a\]):not(.text-\[\#006a63\]):not(.text-\[\#5eead4\]):not([class*="rose"]):not([class*="red"]):not([class*="emerald"]):not([class*="teal"]),
+:root[data-theme='light'] :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .tabular-nums:not(.text-\[\#ba1a1a\]):not(.text-\[\#93000a\]):not(.text-\[\#006a63\]):not(.text-\[\#5eead4\]):not([class*="rose"]):not([class*="red"]):not([class*="emerald"]):not([class*="teal"]),
+html.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .tabular-nums:not(.text-\[\#ba1a1a\]):not(.text-\[\#93000a\]):not(.text-\[\#006a63\]):not(.text-\[\#5eead4\]):not([class*="rose"]):not([class*="red"]):not([class*="emerald"]):not([class*="teal"]),
+.light :not(aside):not(.bg-\[\#172554\]):not(.bg-\[\#000f3f\]) .tabular-nums:not(.text-\[\#ba1a1a\]):not(.text-\[\#93000a\]):not(.text-\[\#006a63\]):not(.text-\[\#5eead4\]):not([class*="rose"]):not([class*="red"]):not([class*="emerald"]):not([class*="teal"]) {
+  color: #020617 !important;
+}
+
+/* Light mode table headers: dark bold typography */
+html:not(.dark) table thead tr,
+:root[data-theme='light'] table thead tr,
+html.light table thead tr,
+.light table thead tr {
+  background-color: #f1f4fb !important;
+  color: #020617 !important;
+}
+
+html:not(.dark) table thead th,
+:root[data-theme='light'] table thead th,
+html.light table thead th,
+.light table thead th {
+  color: #020617 !important;
+  font-weight: 700 !important;
+}
+
+/* Light mode table body cells: dark crisp typography */
+html:not(.dark) table tbody td,
+:root[data-theme='light'] table tbody td,
+html.light table tbody td,
+.light table tbody td {
+  color: #0f172a !important;
+}
+
+/* Form input text & placeholder in light mode */
+html:not(.dark) input,
+html:not(.dark) textarea,
+html:not(.dark) select {
+  color: #020617 !important;
+}
+
+html:not(.dark) input::placeholder,
+html:not(.dark) textarea::placeholder,
+:root[data-theme='light'] input::placeholder,
+:root[data-theme='light'] textarea::placeholder {
+  color: #475569 !important;
+  opacity: 1 !important;
+}
+
+/* ===================================================
+   SIDEBAR & DARK CONTAINERS PRESERVATION
+   Sidebar is dark navy (#000f3f) across both themes,
+   so text inside must stay bright and clearly visible
+   =================================================== */
+aside,
+aside *,
+aside [class*="text-"] {
+  color: #cbd5e1;
+}
+
+aside .text-white,
+aside [class*="text-white"],
+aside h1, aside h2, aside h3 {
+  color: #ffffff !important;
+}
+
+aside span.text-\[\#808dc2\],
+aside div.text-\[\#808dc2\],
+aside p.text-\[\#808dc2\],
+aside button.text-\[\#808dc2\] {
+  color: #94a3b8 !important;
+}
+
+aside .font-bold.text-\[\#808dc2\],
+aside [class*="uppercase"].text-\[\#808dc2\] {
+  color: #e2e8f0 !important;
+}
+
+aside nav button:not(.bg-\[\#006a63\]) {
+  color: #cbd5e1 !important;
+}
+
+aside nav button:not(.bg-\[\#006a63\]):hover {
+  color: #ffffff !important;
+  background-color: #172554 !important;
+}
+
+aside nav button.bg-\[\#006a63\],
+aside nav button.bg-\[\#006a63\] * {
+  color: #ffffff !important;
+}
+
+/* Dark container banner preservation */
+.bg-\[\#172554\] .text-\[\#808dc2\],
+.bg-\[\#000f3f\] .text-\[\#808dc2\] {
+  color: #cbd5e1 !important;
+}
+
+.bg-\[\#172554\] .text-white,
+.bg-\[\#000f3f\] .text-white {
+  color: #ffffff !important;
+}
+
+/* ===================================================
    DARK THEME SYSTEM
    =================================================== */
 html.dark,
@@ -260,7 +754,9 @@ html.dark,
 }
 
 /* Text Colors */
-.dark .text-\[\#000f3f\] {
+.dark .text-\[\#000f3f\],
+.dark .text-\[\#020617\],
+.dark .text-\[\#0a0f1d\] {
   color: #ffffff !important;
 }
 
@@ -268,12 +764,39 @@ html.dark,
   color: #f8fafc !important;
 }
 
-.dark .text-\[\#45464f\] {
+.dark .text-\[\#45464f\],
+.dark .text-\[\#0f172a\],
+.dark .text-\[\#1e293b\] {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-\[\#334155\] {
+  color: #e2e8f0 !important;
+}
+
+.dark .text-\[\#767680\],
+.dark .text-\[\#475569\],
+.dark .text-\[\#64748b\],
+.dark .text-\[\#94a3b8\] {
   color: #94a3b8 !important;
 }
 
-.dark .text-\[\#767680\] {
-  color: #64748b !important;
+.dark .text-\[\#172554\] {
+  color: #93c5fd !important;
+}
+
+.dark .text-\[\#808dc2\] {
+  color: #cbd5e1 !important;
+}
+
+.dark .text-\[\#006a63\],
+.dark .text-\[\#007a72\] {
+  color: #5eead4 !important;
+}
+
+/* Numeric & Currency Stat Indicators */
+.dark .tabular-nums:not(.text-\[\#ba1a1a\]):not(.text-\[\#93000a\]):not(.text-\[\#006a63\]):not(.text-\[\#5eead4\]):not([class*="rose"]):not([class*="red"]):not([class*="emerald"]):not([class*="teal"]) {
+  color: #ffffff !important;
 }
 
 /* Borders & Dividers */
@@ -298,17 +821,29 @@ html.dark,
 
 .dark input::placeholder,
 .dark textarea::placeholder {
-  color: #64748b !important;
+  color: #94a3b8 !important;
+}
+
+.dark select option {
+  background-color: #111827 !important;
+  color: #f8fafc !important;
+}
+
+html:not(.dark) select option {
+  background-color: #ffffff !important;
+  color: #020617 !important;
 }
 
 /* Table Elements */
+.dark table thead tr,
 .dark table thead th {
   background-color: #0d1525 !important;
-  color: #94a3b8 !important;
+  color: #cbd5e1 !important;
   border-color: #1e293b !important;
 }
 
 .dark table tbody td {
+  color: #f1f5f9 !important;
   border-color: #1e293b !important;
 }
 
@@ -356,5 +891,73 @@ html.dark,
 .dark .shadow-2xl {
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55) !important;
 }
+
+/* Dark Theme Button Illumination & Soft Ambient Glows (Calibrated & Eye-Friendly) */
+.dark button.bg-\[\#000f3f\]:not(.btn-input-icon) {
+  background-color: #1e293b !important;
+  border: 1px solid rgba(129, 140, 248, 0.2) !important;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35) !important;
+}
+
+.dark button.bg-\[\#000f3f\]:not(.btn-input-icon):hover {
+  background-color: #27354f !important;
+  border-color: rgba(165, 180, 252, 0.4) !important;
+  box-shadow: 0 0 12px 1px rgba(129, 140, 248, 0.22) !important;
+}
+
+.dark button.bg-\[\#006a63\]:not(.btn-input-icon) {
+  background-color: #006a63 !important;
+  border: 1px solid rgba(79, 219, 200, 0.25) !important;
+  box-shadow: 0 2px 6px rgba(0, 106, 99, 0.25) !important;
+}
+
+.dark button.bg-\[\#006a63\]:not(.btn-input-icon):hover {
+  background-color: #007a72 !important;
+  border-color: rgba(113, 248, 228, 0.45) !important;
+  box-shadow: 0 0 14px 2px rgba(113, 248, 228, 0.25) !important;
+}
+
+.dark button.bg-\[\#eaedff\]:not(.btn-input-icon) {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.dark button.bg-\[\#eaedff\]:not(.btn-input-icon):hover {
+  background-color: #26334a !important;
+  border-color: rgba(129, 140, 248, 0.3) !important;
+  box-shadow: 0 0 10px rgba(129, 140, 248, 0.18) !important;
+}
+
+/* Softer general button hover & press filters in dark mode */
+.dark button:not(.btn-input-icon):hover:not(:disabled) {
+  filter: brightness(1.05) !important;
+}
+
+.dark button:not(.btn-input-icon):active:not(:disabled),
+.dark button:not(.btn-input-icon).is-touching-light {
+  filter: brightness(1.1) contrast(1.02) !important;
+  box-shadow: 0 0 14px 2px rgba(113, 248, 228, 0.3) !important;
+}
+
+/* Subtle, gentle sheen sweep in dark mode */
+.dark button:not(.no-sheen)::before,
+.dark [role="button"]:not(.no-sheen)::before {
+  opacity: 0.22 !important;
+}
+
+/* Gentle touch light ripple burst in dark mode */
+.dark .touch-light-burst {
+  opacity: 0.35 !important;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(113, 248, 228, 0.25) 30%,
+    transparent 65%
+  ) !important;
+}
+
+
+
 
 

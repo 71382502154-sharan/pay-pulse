@@ -1,4 +1,66 @@
 {
+  "users": [
+    {
+      "id": "usr-admin-1",
+      "email": "admin@paypulse.corp",
+      "passwordHash": "$2b$10$uP0MtOjZmQEKVyhM/HOWAORRojFoNOH8m0XzlCCNPOx5/PK5Bgduy",
+      "name": "Sashmitha S M",
+      "role": "HR Payroll Director",
+      "department": "People Operations",
+      "avatarBg": "#000f3f",
+      "createdAt": "2026-09-14T06:01:16.523Z"
+    },
+    {
+      "id": "usr-finance-1",
+      "email": "finance@paypulse.corp",
+      "passwordHash": "$2b$10$9d1JABs9iJxqqwu9Dv7QJuacQRSfg.LFIApiPS8Rjd1ssB6cbWt6S",
+      "name": "Seashora R",
+      "role": "Chief Financial Controller",
+      "department": "Finance & Accounts",
+      "avatarBg": "#006a63",
+      "createdAt": "2026-09-14T06:01:16.600Z"
+    },
+    {
+      "id": "usr-audit-1",
+      "email": "audit@paypulse.corp",
+      "passwordHash": "$2b$10$S3.N1CEnXT7ED.2dI5jzTOUQm3/gdeP/w9GbFgFf/RZA7kWI8sLU.",
+      "name": "Sathana G",
+      "role": "Compliance & Statutory Auditor",
+      "department": "Internal Audit",
+      "avatarBg": "#1e3a8a",
+      "createdAt": "2026-09-14T06:01:16.678Z"
+    },
+    {
+      "id": "usr-1789365716485",
+      "email": "test@paypulse.corp",
+      "passwordHash": "$2b$10$v2/BoLisGIiLKsxm2WxfPOUYOGff23lXJ8nqLGMtIG3Lt5W0ohCyW",
+      "name": "Test User",
+      "role": "Auditor",
+      "department": "Finance",
+      "avatarBg": "#006a63",
+      "createdAt": "2026-09-14T06:01:56.485Z"
+    },
+    {
+      "id": "usr-1789366186959",
+      "email": "sharan@gmail.com",
+      "passwordHash": "$2b$10$UN5K5pK9al7WVnfAuSCe0OxfyjbjN.XMDRQdnrgAk3jH/2fLgN.vC",
+      "name": "SHARAN",
+      "role": "HR Payroll Director",
+      "department": "Human Resources",
+      "avatarBg": "#006a63",
+      "createdAt": "2026-09-14T06:09:46.960Z"
+    },
+    {
+      "id": "usr-1789366285810",
+      "email": "shar@gmail.com",
+      "passwordHash": "$2b$10$bt79SMPoaHAQ3Ip6znp3ROK7wphfjaVcr7vCFYqNrvLIvr1vwNI5.",
+      "name": "SHARAN R",
+      "role": "Senior People Operations Lead",
+      "department": "Human Resources",
+      "avatarBg": "#006a63",
+      "createdAt": "2026-09-14T06:11:25.810Z"
+    }
+  ],
   "employees": [
     {
       "id": "emp-1",

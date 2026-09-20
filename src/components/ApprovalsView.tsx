@@ -1,5 +1,19 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — CYCLE APPROVALS VIEW
+ * ============================================================================
+ * Executive sign-off interface for departmental adjustments, ad-hoc incentives,
+ * and leadership bonus recommendations. Supports item-level authorization and
+ * 1-click batch approvals.
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { ApprovalItem } from '../types';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface ApprovalsViewProps {
   approvals: ApprovalItem[];
@@ -7,6 +21,10 @@ interface ApprovalsViewProps {
   onBatchApproveAll: () => void;
   onShowToast: (msg: string) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION                                                */
+/* ========================================================================== */
 
 export const ApprovalsView: React.FC<ApprovalsViewProps> = ({
   approvals,

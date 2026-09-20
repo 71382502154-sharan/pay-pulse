@@ -1,11 +1,28 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — RULE ENGINE AUDIT LOGS MODAL
+ * ============================================================================
+ * Cryptographic calculation log terminal displaying rule executions, statutory
+ * checks (EPFO, ESIC, Section 10, TDS), and negative net pay barrier evaluations.
+ * ============================================================================
+ */
+
 import React from 'react';
 import { motion } from 'motion/react';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface RuleEngineLogsModalProps {
   isOpen: boolean;
   onClose: () => void;
   onShowToast: (msg: string) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION                                                */
+/* ========================================================================== */
 
 export const RuleEngineLogsModal: React.FC<RuleEngineLogsModalProps> = ({
   isOpen,

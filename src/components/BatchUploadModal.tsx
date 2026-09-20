@@ -1,12 +1,29 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — BATCH ADJUSTMENT UPLOAD MODAL
+ * ============================================================================
+ * Bulk ingestion dialog for processing multi-employee allowance/deduction
+ * spreadsheets with sample CSV download and drag-and-drop validation.
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { downloadBatchTemplateCSV } from '../utils/downloadUtils';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface BatchUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
   onShowToast: (msg: string) => void;
 }
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION                                                */
+/* ========================================================================== */
 
 export const BatchUploadModal: React.FC<BatchUploadModalProps> = ({
   isOpen,

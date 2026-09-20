@@ -1,5 +1,27 @@
-import { ApprovalItem, DiscrepancyEmployee, EmployeeRow, MilestoneEvent } from '../types';
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — SEED & REFERENCE DATASETS
+ * ============================================================================
+ * Centralized repository of institutional initial states, seed rosters,
+ * approval queues, audit trails, and notification templates.
+ * ============================================================================
+ */
 
+import {
+  ApprovalItem,
+  DiscrepancyEmployee,
+  EmployeeRow,
+  MilestoneEvent,
+  NotificationItem,
+} from '../types';
+
+/* ========================================================================== */
+/* 1. INITIAL WORKFORCE ROSTER                                                */
+/* ========================================================================== */
+
+/**
+ * Baseline team member records populated upon cold-start / initialization.
+ */
 export const INITIAL_EMPLOYEES: EmployeeRow[] = [
   {
     id: 'emp-1',
@@ -87,6 +109,13 @@ export const INITIAL_EMPLOYEES: EmployeeRow[] = [
   },
 ];
 
+/* ========================================================================== */
+/* 2. CYCLE APPROVALS QUEUE                                                   */
+/* ========================================================================== */
+
+/**
+ * Initial cycle adjustments and bonus requests awaiting director sign-off.
+ */
 export const INITIAL_APPROVALS: ApprovalItem[] = [
   {
     id: 'app-1',
@@ -156,6 +185,13 @@ export const INITIAL_APPROVALS: ApprovalItem[] = [
   },
 ];
 
+/* ========================================================================== */
+/* 3. AUDIT TRAIL MILESTONES                                                  */
+/* ========================================================================== */
+
+/**
+ * Initial compliance events and audit milestones.
+ */
 export const INITIAL_MILESTONES: MilestoneEvent[] = [
   {
     id: 'm-1',
@@ -187,6 +223,13 @@ export const INITIAL_MILESTONES: MilestoneEvent[] = [
   },
 ];
 
+/* ========================================================================== */
+/* 4. DISCREPANCY RECONCILIATION DATA                                         */
+/* ========================================================================== */
+
+/**
+ * Initial flagged records requiring resolution before disbursement locks clear.
+ */
 export const INITIAL_DISCREPANCIES: DiscrepancyEmployee[] = [
   {
     id: 'disc-1',
@@ -283,5 +326,81 @@ export const INITIAL_DISCREPANCIES: DiscrepancyEmployee[] = [
       'Approve System Architecture Incentive',
     ],
     resolved: false,
+  },
+];
+
+/* ========================================================================== */
+/* 5. SYSTEM NOTIFICATIONS                                                    */
+/* ========================================================================== */
+
+/**
+ * Initial system notifications and operational alerts.
+ */
+export const INITIAL_NOTIFICATIONS: NotificationItem[] = [
+  {
+    id: 'notif-1',
+    title: '3 Negative Net Pay Discrepancies Flagged',
+    description: 'Statutory withholdings and loan EMI recoveries exceed monthly gross compensation for 3 staff members.',
+    impact: 'Automated escrow disbursement lock activated. Director resolution required.',
+    category: 'critical',
+    timestamp: '10 mins ago',
+    read: false,
+    actionLabel: 'Resolve Discrepancies',
+    actionType: 'discrepancies',
+  },
+  {
+    id: 'notif-2',
+    title: 'Direct Escrow Disbursement Batch Formatted',
+    description: '256-bit encrypted direct-deposit batch generated with automated negative net pay locks.',
+    impact: 'Escrow clearing verification scheduled for today.',
+    category: 'fiduciary',
+    timestamp: '25 mins ago',
+    read: false,
+    actionLabel: 'View Pay Runs',
+    actionType: 'payrun',
+  },
+  {
+    id: 'notif-3',
+    title: 'EPFO Electronic Challan Return (ECR) Ready for Submission',
+    description: 'Universal text file formatted per EPFO unified portal specs generated for 1,428 staff UAN contributions.',
+    impact: 'Statutory compliance deadline: 15 March 2025.',
+    category: 'statutory',
+    timestamp: 'Today, 11:30 AM',
+    read: false,
+    actionLabel: 'Download ECR Text File',
+    actionType: 'reports',
+  },
+  {
+    id: 'notif-4',
+    title: 'March 2025 Biometric Timesheet Sync Completed',
+    description: 'Pulled 21,480 biometric punch logs from ZK-Teco cloud gateway. 18 unpaid LOP deductions computed.',
+    impact: 'Total LOP withholding: ₹1,42,800 across 3 departments.',
+    category: 'system',
+    timestamp: 'Today, 09:15 AM',
+    read: true,
+    actionLabel: 'Inspect LOP Ledger',
+    actionType: 'attendance',
+  },
+  {
+    id: 'notif-5',
+    title: 'Director Sign-off Pending in Approvals Queue',
+    description: '4 cycle adjustments and ad-hoc bonuses submitted by department leads require executive sign-off.',
+    impact: 'Budget variance: +₹95,000 against departmental heads.',
+    category: 'fiduciary',
+    timestamp: 'Yesterday, 04:45 PM',
+    read: true,
+    actionLabel: 'Inspect Approvals',
+    actionType: 'approvals',
+  },
+  {
+    id: 'notif-6',
+    title: 'HDFC Corporate Escrow CMS Balance Verified',
+    description: 'Liquid escrow balance ₹12.4 Cr verified > ₹6.94 Cr required net payout. Scheduled value date: 31 March 2025.',
+    impact: 'Zero liquidity shortfall detected.',
+    category: 'system',
+    timestamp: '06 Mar 2025',
+    read: true,
+    actionLabel: 'Review Pay Run Execution',
+    actionType: 'payrun',
   },
 ];

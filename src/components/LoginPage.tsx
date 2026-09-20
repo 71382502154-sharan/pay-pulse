@@ -1,295 +1,686 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
-import { Eye, EyeOff } from 'lucide-react';
-import { UserProfile } from '../types';
-import { getInitials } from '../utils/userUtils';
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — DIRECT CONSOLE LOGIN GATEWAY
+ * ============================================================================
+ * Clean, frictionless 1-step authentication gateway providing direct access to
+ * the PayPulse enterprise console. Supports 1-click demo role accounts, account
+ * registration, and resilient local session fallback if the backend is offline.
+ * ============================================================================
+ */
+
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Eye, EyeOff, UserPlus, LogIn, Sparkles, Building2, Briefcase, Sun, Moon, ArrowLeft } from 'lucide-react';
+import { UserProfile, AuthResponse } from '../types';
+import { PayPulseLogo } from './PayPulseLogo';
+
+/* ========================================================================== */
+/* 1. TYPES & PRECONFIGURED DEMO ACCOUNTS                                     */
+/* ========================================================================== */
 
 interface LoginPageProps {
-  onLogin: (user: UserProfile) => void;
+  onLogin: (user: UserProfile, token: string) => void;
+  onBackToLanding?: () => void;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ onLogin }) => {
+type AuthMode = 'signin' | 'register';
+
+interface DemoAccount {
+  label: string;
+  role: string;
+  email: string;
+  pass: string;
+  badge: string;
+}
+
+const DEMO_ACCOUNTS: DemoAccount[] = [
+  {
+    label: 'HR Director',
+    role: 'Full Admin',
+    email: 'admin@paypulse.corp',
+    pass: 'Admin@123',
+    badge: 'Director',
+  },
+  {
+    label: 'Finance Lead',
+    role: 'Disbursements',
+    email: 'finance@paypulse.corp',
+    pass: 'Finance@123',
+    badge: 'Controller',
+  },
+  {
+    label: 'Auditor',
+    role: 'Compliance',
+    email: 'audit@paypulse.corp',
+    pass: 'Audit@123',
+    badge: 'Auditor',
+  },
+];
+
+/* ========================================================================== */
+/* 2. COMPONENT DEFINITION & STATE                                            */
+/* ========================================================================== */
+
+export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onBackToLanding }) => {
+  const [mode, setMode] = useState<AuthMode>('signin');
+  
+  const [isDark, setIsDark] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('paypulse_theme') === 'dark';
+    } catch {
+      return false;
+    }
+  });
+
+  // Theme synchronization
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.classList.remove('light');
+      document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+      document.documentElement.setAttribute('data-theme', 'light');
+    }
+    try {
+      localStorage.setItem('paypulse_theme', isDark ? 'dark' : 'light');
+      window.dispatchEvent(new CustomEvent('paypulse-theme-change', { detail: { theme: isDark ? 'dark' : 'light' } }));
+    } catch {}
+  }, [isDark]);
+
+  useEffect(() => {
+    const handleExternalThemeChange = (e: Event) => {
+      const customEvent = e as CustomEvent<{ theme: 'dark' | 'light' }>;
+      if (customEvent.detail?.theme) {
+        setIsDark(customEvent.detail.theme === 'dark');
+      }
+    };
+    window.addEventListener('paypulse-theme-change', handleExternalThemeChange);
+    return () => window.removeEventListener('paypulse-theme-change', handleExternalThemeChange);
+  }, []);
+
+  // Form states
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('HR Payroll Director');
-  const [department, setDepartment] = useState('People Operations');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('admin@paypulse.corp');
+  const [password, setPassword] = useState('Admin@123');
+  const [role, setRole] = useState('Senior People Operations Lead');
+  const [department, setDepartment] = useState('Human Resources');
+
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSelectDemo = (acc: DemoAccount) => {
+    setMode('signin');
+    setEmail(acc.email);
+    setPassword(acc.pass);
+    setErrorMessage('');
+    setSuccessMessage(`Loaded ${acc.label} credentials. Click "Sign In" below.`);
+    setTimeout(() => setSuccessMessage(''), 2500);
+  };
+
+  // Direct 1-Step Login & Registration
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim()) {
-      setErrorMessage('Please enter your full name to proceed.');
-      return;
+    setErrorMessage('');
+    setSuccessMessage('');
+
+    if (mode === 'signin') {
+      if (!email.trim() || !password) {
+        setErrorMessage('Please provide both corporate email and password.');
+        return;
+      }
+    } else {
+      if (!fullName.trim()) {
+        setErrorMessage('Full legal name is required.');
+        return;
+      }
+      if (!email.trim()) {
+        setErrorMessage('Corporate work email is required.');
+        return;
+      }
+      if (password.length < 6) {
+        setErrorMessage('Password must be at least 6 characters long.');
+        return;
+      }
     }
 
-    setErrorMessage('');
     setIsLoading(true);
+    try {
+      const endpoint = mode === 'signin' ? '/api/auth/login' : '/api/auth/register';
+      const body = mode === 'signin'
+        ? { email: email.trim(), password }
+        : {
+            name: fullName.trim(),
+            email: email.trim(),
+            password,
+            role: role.trim(),
+            department: department.trim(),
+          };
 
-    setTimeout(() => {
-      onLogin({
-        name: fullName.trim(),
-        email: email.trim() || `${fullName.toLowerCase().replace(/\s+/g, '.')}@paypulse.corp`,
-        role: role.trim() || 'Payroll Specialist',
-        department: department.trim() || 'Operations',
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
       });
+
+      const data: AuthResponse = await res.json();
+      if (!res.ok || !data.success || !data.user || !data.token) {
+        throw new Error(data.message || 'Authentication failed. Please verify your credentials.');
+      }
+
+      setSuccessMessage('Authentication confirmed! Accessing console...');
+      setTimeout(() => {
+        onLogin(data.user!, data.token!);
+      }, 300);
+    } catch (err: unknown) {
+      // Graceful offline fallback: if backend is unreachable, allow instant login for demo accounts / local testing
+      const isFetchError = err instanceof TypeError && err.message.toLowerCase().includes('fetch');
+      if (isFetchError) {
+        console.warn('[PayPulse Auth] Backend server offline; providing seamless local session fallback.');
+        const matchedDemo = DEMO_ACCOUNTS.find((a) => a.email.toLowerCase() === email.trim().toLowerCase());
+        const fallbackUser: UserProfile = {
+          id: `usr-${Date.now()}`,
+          name: mode === 'register' ? fullName.trim() : (matchedDemo ? matchedDemo.label : (email.split('@')[0] || 'Operator')),
+          email: email.trim(),
+          role: mode === 'register' ? role.trim() : (matchedDemo ? matchedDemo.role : 'Senior People Operations Lead'),
+          department: mode === 'register' ? department.trim() : 'Human Resources',
+          avatarBg: '#006a63',
+        };
+        const fallbackToken = `mock-token-${Date.now()}`;
+        setSuccessMessage('Console access granted! Initializing...');
+        setTimeout(() => {
+          onLogin(fallbackUser, fallbackToken);
+        }, 300);
+        return;
+      }
+
+      const message = err instanceof Error ? err.message : 'Authentication failed. Please verify your credentials.';
+      setErrorMessage(message);
+    } finally {
       setIsLoading(false);
-    }, 450);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-[#000f3f] relative flex items-center justify-center p-4 sm:p-6 md:p-10 overflow-hidden font-['Hanken_Grotesk'] text-[#131b2e]">
-      {/* Ambient background glows */}
-      <div className="absolute -top-40 -left-40 w-96 h-96 bg-[#006a63]/25 rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-[#172554] rounded-full blur-3xl pointer-events-none"></div>
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] bg-[#99efe5]/5 rounded-full blur-3xl pointer-events-none"></div>
-
-      {/* Grid line pattern overlay */}
-      <div 
-        className="absolute inset-0 opacity-[0.03] pointer-events-none" 
+    <div className={`min-h-screen relative flex items-center justify-center p-4 sm:p-6 md:p-10 transition-colors duration-300 font-['Hanken_Grotesk'] overflow-hidden ${
+      isDark ? 'bg-[#0b0f19] text-[#f8fafc]' : 'bg-[#faf8ff] text-[#131b2e]'
+    }`}>
+      {/* Dynamic Background Ambient Gradients matching Landing Page */}
+      <div
+        className="absolute top-1/4 left-1/2 w-[720px] h-[520px] rounded-full blur-[140px] pointer-events-none opacity-25 transition-all duration-700"
         style={{
-          backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)',
-          backgroundSize: '24px 24px'
+          background: isDark
+            ? 'radial-gradient(circle, rgba(0, 106, 99, 0.35) 0%, rgba(113, 248, 228, 0.15) 45%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(0, 106, 99, 0.12) 0%, rgba(23, 37, 84, 0.08) 50%, transparent 70%)',
+          transform: 'translate3d(-50%, -50%, 0)',
+          willChange: 'transform',
+        }}
+      />
+      <div
+        className="absolute top-2/3 right-1/4 w-[600px] h-[450px] rounded-full blur-[160px] pointer-events-none opacity-20 transition-all duration-700"
+        style={{
+          background: isDark
+            ? 'radial-gradient(circle, rgba(23, 37, 84, 0.35) 0%, rgba(128, 141, 194, 0.12) 50%, transparent 70%)'
+            : 'radial-gradient(circle, rgba(79, 92, 142, 0.1) 0%, transparent 70%)',
         }}
       />
 
-      <div className="relative w-full max-w-xl z-10 mx-auto space-y-5">
-        {/* Web Application Name & Brand Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="text-center space-y-2"
+      {/* Top Bar: Left Back to Landing & Right Theme Switcher */}
+      {onBackToLanding && (
+        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
+          <button
+            type="button"
+            onClick={onBackToLanding}
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border shadow-sm cursor-pointer ${
+              isDark 
+                ? 'bg-[#000f3f]/80 border-[#172554] text-white hover:bg-[#172554]' 
+                : 'bg-white border-[#eaedff] text-[#131b2e] hover:bg-[#f2f3ff]'
+            }`}
+          >
+            <ArrowLeft className="w-3.5 h-3.5" />
+            <span>Landing Page</span>
+          </button>
+        </div>
+      )}
+
+      {/* Top Bar: Theme Switcher */}
+      <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-20">
+        <button
+          type="button"
+          onClick={() => setIsDark(!isDark)}
+          className={`flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all border shadow-sm cursor-pointer ${
+            isDark 
+              ? 'bg-[#000f3f]/80 border-[#172554] text-white hover:bg-[#172554]' 
+              : 'bg-white border-[#eaedff] text-[#131b2e] hover:bg-[#f2f3ff]'
+          }`}
+          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#172554]/90 border border-[#808dc2]/30 text-[#71f8e4] text-xs font-semibold backdrop-blur-md shadow-xs">
-            <span className="w-2 h-2 rounded-full bg-[#71f8e4] animate-pulse"></span>
-            <span>Enterprise Payroll Console</span>
+          {isDark ? (
+            <>
+              <Sun className="w-3.5 h-3.5 text-amber-400" />
+              <span>Light Mode</span>
+            </>
+          ) : (
+            <>
+              <Moon className="w-3.5 h-3.5 text-[#006a63]" />
+              <span>Dark Mode</span>
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="relative w-full max-w-xl z-10 mx-auto space-y-6">
+        {/* Brand Header */}
+        <motion.div 
+          initial={{ opacity: 0, y: -12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="text-center space-y-2 flex flex-col items-center"
+        >
+          <PayPulseLogo size="xl" variant="badge" className="shadow-xl mb-1 ring-2 ring-teal-500/20" />
+          <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border ${
+            isDark 
+              ? 'bg-teal-950/60 border-teal-500/30 text-teal-300' 
+              : 'bg-teal-50 border-teal-200 text-[#006a63]'
+          }`}>
+            <span className="w-2 h-2 rounded-full bg-teal-500"></span>
+            <span>PayPulse Console Login</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold font-['Plus_Jakarta_Sans'] text-white tracking-tight">
-            PayPulse <span className="text-[#71f8e4]">Enterprise</span>
+          <h1 className={`text-3xl sm:text-4xl font-extrabold font-['Plus_Jakarta_Sans'] tracking-tight ${
+            isDark ? 'text-white' : 'text-[#131b2e]'
+          }`}>
+            PayPulse Console
           </h1>
-          <p className="text-xs sm:text-sm text-[#808dc2]">
-            Compensation Structuring &amp; Institutional Governance System
+          <p className={`text-xs sm:text-sm font-medium max-w-md ${
+            isDark ? 'text-slate-400' : 'text-[#45464f]'
+          }`}>
+            Sign in with your corporate credentials or select a demo role below to access the console.
           </p>
         </motion.div>
 
-        {/* Centered Login Card */}
+        {/* High-Contrast Login Card */}
         <motion.div 
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.05 }}
-          className="w-full bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-[#eaedff] p-6 sm:p-8 md:p-10 relative overflow-hidden"
+          transition={{ duration: 0.4, delay: 0.05 }}
+          className={`w-full rounded-2xl sm:rounded-3xl shadow-2xl p-6 sm:p-8 md:p-9 relative border transition-colors duration-200 backdrop-blur-xl ${
+            isDark 
+              ? 'bg-[#111827]/95 border-[#1e293b] shadow-[0_20px_50px_rgba(0,0,0,0.5)]' 
+              : 'bg-white/95 border-[#eaedff] shadow-[0_15px_35px_rgba(0,15,63,0.06)]'
+          }`}
         >
-          {/* Top Logo Bar */}
-          <div className="flex items-center justify-between pb-6 border-b border-[#eaedff]">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-xl bg-[#000f3f] text-[#71f8e4] flex items-center justify-center shadow-md ring-2 ring-[#006a63]/30 shrink-0">
-                <span className="material-symbols-outlined text-2xl">account_balance_wallet</span>
+          <div>
+            {/* Card Top: Mode Switcher Tabs */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-5 border-b border-[#eaedff] dark:border-[#1e293b] gap-4">
+              <div className="flex-1 min-w-0 pr-2">
+                <div className={`font-['Plus_Jakarta_Sans'] font-extrabold text-lg sm:text-xl tracking-tight flex items-center gap-2 flex-wrap ${
+                  isDark ? 'text-white' : 'text-[#131b2e]'
+                }`}>
+                  <span>{mode === 'signin' ? 'Sign In' : 'Register Account'}</span>
+                </div>
+                <div className={`text-xs font-medium mt-0.5 ${
+                  isDark ? 'text-slate-400' : 'text-[#45464f]'
+                }`}>
+                  {mode === 'signin' 
+                    ? 'Enter your credentials below to access the console.' 
+                    : 'Create a new operator account for instant console access.'}
+                </div>
               </div>
-              <div>
-                <div className="font-['Plus_Jakarta_Sans'] font-extrabold text-xl sm:text-2xl tracking-tight flex items-center gap-2 flex-wrap">
-                  <span className="text-[#000f3f] dark:text-white font-black drop-shadow-xs">PayPulse</span>
-                  <span className="text-[#006a63] dark:text-[#71f8e4]">Enterprise</span>
-                  <span className="text-[0.6875rem] font-bold px-2 py-0.5 rounded-md bg-[#eaedff] text-[#006a63] border border-[#006a63]/20">
-                    Portal
+
+              {/* Mode Switcher Buttons */}
+              <div className={`flex items-center p-1 rounded-xl border shrink-0 whitespace-nowrap self-start sm:self-auto text-xs font-['Plus_Jakarta_Sans'] font-semibold ${
+                isDark ? 'bg-[#0b0f19] border-[#1e293b]' : 'bg-[#f2f3ff] border-[#eaedff]'
+              }`}>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('signin');
+                    setErrorMessage('');
+                  }}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg transition-all cursor-pointer font-bold whitespace-nowrap shrink-0 leading-none ${
+                    mode === 'signin'
+                      ? 'bg-[#006a63] text-white shadow-sm'
+                      : isDark 
+                        ? 'text-slate-400 hover:text-white' 
+                        : 'text-[#45464f] hover:text-[#131b2e]'
+                  }`}
+                >
+                  <LogIn className="w-3.5 h-3.5 shrink-0" />
+                  <span className="whitespace-nowrap">Sign In</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMode('register');
+                    setErrorMessage('');
+                  }}
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-lg transition-all cursor-pointer font-bold whitespace-nowrap shrink-0 leading-none ${
+                    mode === 'register'
+                      ? 'bg-[#006a63] text-white shadow-sm'
+                      : isDark 
+                        ? 'text-slate-400 hover:text-white' 
+                        : 'text-[#45464f] hover:text-[#131b2e]'
+                  }`}
+                >
+                  <UserPlus className="w-3.5 h-3.5 shrink-0" />
+                  <span className="whitespace-nowrap">Register</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Quick Demo Credentials Box */}
+            {mode === 'signin' && (
+              <div className={`mt-4 p-3.5 rounded-xl border space-y-2.5 ${
+                isDark 
+                  ? 'bg-[#1e293b]/50 border-[#1e293b]' 
+                  : 'bg-[#f2f3ff]/80 border-[#eaedff]'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <span className={`text-[0.6875rem] font-bold uppercase tracking-wider flex items-center gap-1.5 ${
+                    isDark ? 'text-teal-400' : 'text-[#006a63]'
+                  }`}>
+                    <Sparkles className="w-3.5 h-3.5" />
+                    Quick Demo Accounts (1-Click Fill)
+                  </span>
+                  <span className={`text-[0.625rem] font-medium ${
+                    isDark ? 'text-slate-400' : 'text-[#767680]'
+                  }`}>
+                    Default Password: Admin@123
                   </span>
                 </div>
-                <div className="text-xs text-[#45464f] dark:text-[#94a3b8] font-medium mt-0.5">
-                  Identity &amp; Role-Based Access Control
+                <div className="grid grid-cols-3 gap-2">
+                  {DEMO_ACCOUNTS.map((acc) => (
+                    <button
+                      key={acc.label}
+                      type="button"
+                      onClick={() => handleSelectDemo(acc)}
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer group ${
+                        isDark 
+                          ? 'bg-[#111827] hover:bg-[#1a2333] border-[#1e293b] hover:border-teal-500' 
+                          : 'bg-white hover:bg-[#eaedff]/60 border-[#eaedff] hover:border-[#006a63] shadow-xs'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-1 mb-0.5">
+                        <span className={`font-['Plus_Jakarta_Sans'] font-bold text-xs truncate ${
+                          isDark 
+                            ? 'text-white group-hover:text-teal-300' 
+                            : 'text-[#131b2e] group-hover:text-[#006a63]'
+                        }`}>
+                          {acc.label}
+                        </span>
+                      </div>
+                      <div className={`text-[0.625rem] truncate font-medium ${
+                        isDark ? 'text-slate-400' : 'text-[#767680]'
+                      }`}>
+                        {acc.role}
+                      </div>
+                    </button>
+                  ))}
                 </div>
-              </div>
-            </div>
-
-            {fullName.trim() && (
-              <div className="flex items-center gap-2 bg-[#f2f3ff] px-3 py-1.5 rounded-full border border-[#eaedff]">
-                <div className="w-7 h-7 rounded-full bg-[#000f3f] text-[#71f8e4] flex items-center justify-center font-bold text-xs">
-                  {getInitials(fullName)}
-                </div>
-                <span className="text-xs font-semibold text-[#131b2e] truncate max-w-[120px]">
-                  {fullName}
-                </span>
               </div>
             )}
-          </div>
 
-          {errorMessage && (
-            <div className="mt-5 p-3 rounded-xl bg-[#ffdad6]/60 border border-[#ba1a1a]/30 text-[#ba1a1a] text-xs flex items-center gap-2">
-              <span className="material-symbols-outlined text-base shrink-0">error</span>
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-[#131b2e] mb-1.5 font-['Plus_Jakarta_Sans']">
-                Your Full Name <span className="text-[#ba1a1a]">*</span>
-                <span className="font-normal text-[#45464f] ml-1.5 text-[0.6875rem]">(This will display in your profile header)</span>
-              </label>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#767680] text-lg pointer-events-none">
-                  person
-                </span>
-                <input
-                  type="text"
-                  required
-                  value={fullName}
-                  onChange={(e) => setFullName(e.target.value)}
-                  placeholder="Enter your full name"
-                  className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f2f3ff] text-sm text-[#131b2e] placeholder:text-[#767680] border border-[#eaedff] focus:border-[#006a63] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006a63]/20 transition-all font-medium"
-                />
+            {/* Alerts */}
+            {errorMessage && (
+              <div className="mt-4 p-4 rounded-xl border text-xs space-y-2.5 animate-in fade-in duration-200 bg-red-500/10 border-red-500/30 text-red-700 dark:text-red-300">
+                <div className="flex items-start gap-2.5">
+                  <span className="material-symbols-outlined text-lg shrink-0 mt-0.5 text-red-600 dark:text-red-400">
+                    {errorMessage.toLowerCase().includes('not found') ? 'person_search' : 'error'}
+                  </span>
+                  <div className="space-y-0.5 flex-1">
+                    <div className="font-bold font-['Plus_Jakarta_Sans'] text-sm text-red-800 dark:text-red-200">
+                      {errorMessage.toLowerCase().includes('not found') ? 'Email is not found' : 'Authentication Notice'}
+                    </div>
+                    <div className="text-xs text-red-700 dark:text-red-300 font-medium">
+                      {errorMessage}
+                    </div>
+                  </div>
+                </div>
+                {errorMessage.toLowerCase().includes('not found') && mode === 'signin' && (
+                  <div className="pt-2.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 border-t border-red-500/20">
+                    <span className={`text-[11px] font-medium ${isDark ? 'text-slate-400' : 'text-[#45464f]'}`}>
+                      This email address was not found in the database. Would you like to register it?
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode('register');
+                        setErrorMessage('');
+                        setSuccessMessage(`Ready to register "${email}". Fill in your details below.`);
+                        setTimeout(() => setSuccessMessage(''), 3500);
+                      }}
+                      className="px-3.5 py-1.5 text-xs font-bold bg-[#006a63] hover:bg-[#00504a] text-white rounded-lg transition-all shadow-xs cursor-pointer flex items-center gap-1.5 self-start sm:self-auto active:scale-95"
+                    >
+                      <span>Register "{email}" Now</span>
+                      <span className="material-symbols-outlined text-sm">arrow_forward</span>
+                    </button>
+                  </div>
+                )}
               </div>
-            </div>
+            )}
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {successMessage && (
+              <div className="mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in duration-200">
+                <span className="material-symbols-outlined text-base shrink-0">check_circle</span>
+                <span className="font-medium">{successMessage}</span>
+              </div>
+            )}
+
+            {/* Credentials Form */}
+            <form onSubmit={handleLoginSubmit} className="mt-5 space-y-4">
+              <AnimatePresence mode="wait">
+                {mode === 'register' && (
+                  <motion.div
+                    key="register-fields"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-4"
+                  >
+                    <div>
+                      <label className={`block text-xs font-bold mb-1.5 font-['Plus_Jakarta_Sans'] ${
+                        isDark ? 'text-slate-200' : 'text-[#131b2e]'
+                      }`}>
+                        Full Legal Name <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">
+                          person
+                        </span>
+                        <input
+                          type="text"
+                          required
+                          value={fullName}
+                          onChange={(e) => setFullName(e.target.value)}
+                          placeholder="e.g. Maya Chen"
+                          className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border font-medium transition-all focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#006a63] ${
+                            isDark 
+                              ? 'bg-[#0b0f19] border-[#1e293b] text-white placeholder:text-slate-500' 
+                              : 'bg-[#f2f3ff]/60 border-[#eaedff] text-[#131b2e] placeholder:text-[#767680] focus:bg-white'
+                          }`}
+                        />
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label className={`block text-xs font-bold mb-1.5 font-['Plus_Jakarta_Sans'] ${
+                          isDark ? 'text-slate-200' : 'text-[#131b2e]'
+                        }`}>
+                          Designation / Role
+                        </label>
+                        <div className="relative">
+                          <Briefcase className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                          <select
+                            value={role}
+                            onChange={(e) => setRole(e.target.value)}
+                            className={`w-full pl-10 pr-8 py-2.5 rounded-xl text-sm border font-medium transition-all appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#006a63] ${
+                              isDark 
+                                ? 'bg-[#0b0f19] border-[#1e293b] text-white' 
+                                : 'bg-[#f2f3ff]/60 border-[#eaedff] text-[#131b2e] focus:bg-white'
+                            }`}
+                          >
+                            <option value="HR Payroll Director">HR Payroll Director</option>
+                            <option value="Chief Financial Controller">Chief Financial Controller</option>
+                            <option value="Senior People Operations Lead">Senior People Operations Lead</option>
+                            <option value="Payroll Administrator">Payroll Administrator</option>
+                            <option value="Compliance & Statutory Auditor">Compliance & Statutory Auditor</option>
+                          </select>
+                          <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-base">
+                            expand_more
+                          </span>
+                        </div>
+                      </div>
+
+                      <div>
+                        <label className={`block text-xs font-bold mb-1.5 font-['Plus_Jakarta_Sans'] ${
+                          isDark ? 'text-slate-200' : 'text-[#131b2e]'
+                        }`}>
+                          Department
+                        </label>
+                        <div className="relative">
+                          <Building2 className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+                          <input
+                            type="text"
+                            value={department}
+                            onChange={(e) => setDepartment(e.target.value)}
+                            placeholder="e.g. People Operations"
+                            className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border font-medium transition-all focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#006a63] ${
+                              isDark 
+                                ? 'bg-[#0b0f19] border-[#1e293b] text-white placeholder:text-slate-500' 
+                                : 'bg-[#f2f3ff]/60 border-[#eaedff] text-[#131b2e] placeholder:text-[#767680] focus:bg-white'
+                            }`}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <div>
-                <label className="block text-xs font-bold text-[#131b2e] mb-1.5 font-['Plus_Jakarta_Sans']">
-                  Work Email
+                <label className={`block text-xs font-bold mb-1.5 font-['Plus_Jakarta_Sans'] ${
+                  isDark ? 'text-slate-200' : 'text-[#131b2e]'
+                }`}>
+                  Corporate Work Email <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#767680] text-lg pointer-events-none">
+                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none">
                     mail
                   </span>
                   <input
                     type="email"
+                    required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="name@enterprise.corp"
-                    className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-[#f2f3ff] text-sm text-[#131b2e] placeholder:text-[#767680] border border-[#eaedff] focus:border-[#006a63] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006a63]/20 transition-all font-medium"
+                    placeholder="name@paypulse.corp"
+                    autoComplete="email"
+                    className={`w-full pl-10 pr-4 py-2.5 rounded-xl text-sm border font-medium transition-all focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#006a63] ${
+                      isDark 
+                        ? 'bg-[#0b0f19] border-[#1e293b] text-white placeholder:text-slate-500' 
+                        : 'bg-[#f2f3ff]/60 border-[#eaedff] text-[#131b2e] placeholder:text-[#767680] focus:bg-white'
+                    }`}
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-[#131b2e] mb-1.5 font-['Plus_Jakarta_Sans']">
-                  Designation / Role
-                </label>
-                <div className="relative">
-                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#767680] text-lg pointer-events-none">
-                    badge
-                  </span>
-                  <select
-                    value={role}
-                    onChange={(e) => setRole(e.target.value)}
-                    className="w-full pl-10 pr-8 py-2.5 rounded-xl bg-[#f2f3ff] text-sm text-[#131b2e] border border-[#eaedff] focus:border-[#006a63] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006a63]/20 transition-all font-medium appearance-none cursor-pointer"
+                <div className="flex items-center justify-between mb-1.5">
+                  <label 
+                    htmlFor="login-password-field" 
+                    className={`block text-xs font-bold font-['Plus_Jakarta_Sans'] ${
+                      isDark ? 'text-slate-200' : 'text-[#131b2e]'
+                    }`}
                   >
-                    <option value="HR Payroll Director">HR Payroll Director</option>
-                    <option value="Chief Financial Controller">Chief Financial Controller</option>
-                    <option value="Payroll Administrator">Payroll Administrator</option>
-                    <option value="Senior People Operations Lead">Senior People Operations Lead</option>
-                    <option value="Compliance &amp; Statutory Auditor">Compliance &amp; Statutory Auditor</option>
-                    <option value="Executive Director">Executive Director</option>
-                  </select>
-                  <span className="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 text-[#767680] pointer-events-none text-base">
-                    expand_more
+                    Password <span className="text-red-500">*</span>
+                  </label>
+                  {mode === 'register' && (
+                    <span className={`text-[0.625rem] ${isDark ? 'text-slate-400' : 'text-[#767680]'}`}>
+                      Minimum 6 characters
+                    </span>
+                  )}
+                </div>
+                <div className="relative flex items-center">
+                  <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-lg pointer-events-none z-10">
+                    lock
                   </span>
+                  <input
+                    id="login-password-field"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === 'signin' ? 'Enter your account password' : 'Create a password (min 6 chars)'}
+                    autoComplete={mode === 'signin' ? 'current-password' : 'new-password'}
+                    className={`w-full pl-10 pr-12 py-2.5 rounded-xl text-sm border font-medium transition-all focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-[#006a63] ${
+                      isDark 
+                        ? 'bg-[#0b0f19] border-[#1e293b] text-white placeholder:text-slate-500' 
+                        : 'bg-[#f2f3ff]/60 border-[#eaedff] text-[#131b2e] placeholder:text-[#767680] focus:bg-white'
+                    }`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 z-20 text-slate-400 hover:text-teal-500 transition-colors cursor-pointer flex items-center justify-center p-1"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4 text-teal-500" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
               </div>
-            </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label 
-                  htmlFor="login-password-field" 
-                  className="block text-xs font-bold text-[#131b2e] font-['Plus_Jakarta_Sans']"
-                >
-                  Access Security PIN / Password
+              <div className="flex items-center justify-between pt-1">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded text-[#006a63] focus:ring-[#006a63] border-[#eaedff] dark:border-[#1e293b]"
+                  />
+                  <span className={`text-xs ${isDark ? 'text-slate-300' : 'text-[#45464f]'}`}>
+                    Remember on this browser
+                  </span>
                 </label>
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowPassword((prev) => !prev);
-                  }}
-                  className="text-[0.6875rem] text-[#006a63] font-semibold hover:underline cursor-pointer flex items-center gap-1 focus:outline-none"
-                >
-                  {showPassword ? (
-                    <>
-                      <EyeOff className="w-3.5 h-3.5" />
-                      <span>Hide</span>
-                    </>
-                  ) : (
-                    <>
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>Show</span>
-                    </>
-                  )}
-                </button>
+
+                {mode === 'signin' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setErrorMessage('');
+                      setSuccessMessage('Demo hint: Use Admin@123 for default accounts.');
+                      setTimeout(() => setSuccessMessage(''), 3000);
+                    }}
+                    className="text-xs text-[#006a63] dark:text-[#71f8e4] hover:underline font-semibold cursor-pointer"
+                  >
+                    Forgot password?
+                  </button>
+                )}
               </div>
-              <div className="relative">
-                <span className="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-[#767680] text-lg pointer-events-none">
-                  lock
-                </span>
-                <input
-                  id="login-password-field"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter your security PIN or password"
-                  autoComplete="current-password"
-                  className="w-full pl-10 pr-12 py-2.5 rounded-xl bg-[#f2f3ff] text-sm text-[#131b2e] placeholder:text-[#767680] border border-[#eaedff] focus:border-[#006a63] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#006a63]/20 transition-all font-medium"
-                />
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowPassword((prev) => !prev);
-                  }}
-                  title={showPassword ? 'Hide password' : 'Show password'}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 z-20 p-2 text-[#767680] hover:text-[#131b2e] hover:bg-[#eaedff] rounded-lg transition-all cursor-pointer flex items-center justify-center focus:outline-none"
-                >
-                  {showPassword ? (
-                    <EyeOff className="w-4 h-4 text-[#006a63]" />
-                  ) : (
-                    <Eye className="w-4 h-4 text-[#767680]" />
-                  )}
-                </button>
-              </div>
-            </div>
 
-            <div className="pt-1">
-              <label className="flex items-center gap-2 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded text-[#006a63] focus:ring-[#006a63] border-[#eaedff]"
-                />
-                <span className="text-xs text-[#45464f]">Remember profile on this workstation</span>
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full mt-2 py-3 rounded-xl bg-[#000f3f] hover:bg-[#172554] text-white font-['Plus_Jakarta_Sans'] font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-75 cursor-pointer"
-            >
-              {isLoading ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                  <span>Authenticating Session...</span>
-                </>
-              ) : (
-                <>
-                  <span>Sign In to Payroll Console</span>
-                  <span className="material-symbols-outlined text-lg">arrow_forward</span>
-                </>
-              )}
-            </button>
-          </form>
-
-          {/* Footer note */}
-          <div className="mt-6 pt-4 border-t border-[#eaedff] flex items-center justify-between text-[0.6875rem] text-[#767680]">
-            <div className="flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-sm text-[#006a63]">lock</span>
-              <span>256-bit TLS Encrypted Session</span>
-            </div>
-            <span>Corporate Single Sign-On (SSO) Active</span>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full mt-3 py-3 rounded-xl bg-[#006a63] hover:bg-[#00504a] text-white font-['Plus_Jakarta_Sans'] font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 active:scale-[0.99] disabled:opacity-75 cursor-pointer"
+              >
+                {isLoading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                    <span>Signing In to Console...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>{mode === 'signin' ? 'Sign In to Console' : 'Create Account & Access Console'}</span>
+                    <span className="material-symbols-outlined text-lg">arrow_forward</span>
+                  </>
+                )}
+              </button>
+            </form>
           </div>
         </motion.div>
       </div>

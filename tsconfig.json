@@ -17,7 +17,14 @@
     "jsx": "react-jsx",
     "paths": {
       "@/*": [
+        "./src/landing/*",
         "./*"
+      ],
+      "next/link": [
+        "./src/landing/components/common/Link.tsx"
+      ],
+      "next/navigation": [
+        "./src/landing/components/common/Navigation.ts"
       ]
     },
     "allowImportingTsExtensions": true,

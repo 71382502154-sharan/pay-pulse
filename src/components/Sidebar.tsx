@@ -1,17 +1,94 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — CONSOLE SIDEBAR NAVIGATION
+ * ============================================================================
+ * Primary persistent navigation sidebar with expandable/collapsible state,
+ * dynamic badge counters, active tab indicators, and user profile footer.
+ * ============================================================================
+ */
+
 import React from 'react';
 import { NavigationTab, UserProfile } from '../types';
 import { getInitials } from '../utils/userUtils';
+import { PayPulseLogo } from './PayPulseLogo';
+
+/* ========================================================================== */
+/* 1. TYPES & NAVIGATION CONFIGURATION                                        */
+/* ========================================================================== */
 
 interface SidebarProps {
+  /** Active selected navigation tab */
   currentTab: NavigationTab;
+  /** Tab switch callback */
   onSelectTab: (tab: NavigationTab) => void;
+  /** Whether the sidebar is collapsed into mini-icon mode */
   isCollapsed: boolean;
+  /** Toggle collapse handler */
   onToggleCollapse: () => void;
+  /** Number of pending approvals requiring attention */
   pendingApprovalsCount: number;
+  /** Unread notification badge count */
   unreadNotificationsCount?: number;
+  /** Authenticated operator profile */
   user?: UserProfile;
+  /** Logout session callback */
   onLogout?: () => void;
 }
+
+interface NavItemConfig {
+  tab: NavigationTab;
+  label: string;
+  icon: string;
+  badgeType?: 'approvals' | 'notifications';
+}
+
+interface NavSectionConfig {
+  title: string;
+  items: NavItemConfig[];
+}
+
+/**
+ * Declarative navigation structure. New tabs and sections can be added,
+ * reordered, or edited directly within this array.
+ */
+const SIDEBAR_SECTIONS: NavSectionConfig[] = [
+  {
+    title: 'Main',
+    items: [
+      { tab: 'dashboard', label: 'Dashboard', icon: 'space_dashboard' },
+      { tab: 'employees', label: 'Employees', icon: 'badge' },
+      { tab: 'pay-runs', label: 'Pay Runs', icon: 'payments' },
+      { tab: 'approvals', label: 'Approvals', icon: 'fact_check', badgeType: 'approvals' },
+    ],
+  },
+  {
+    title: 'Workforce & Time',
+    items: [
+      { tab: 'attendance', label: 'Attendance', icon: 'schedule' },
+      { tab: 'salary-structure', label: 'Salary Structure', icon: 'account_tree' },
+      { tab: 'allowances-and-deductions', label: 'Allowances & Deductions', icon: 'price_change' },
+      { tab: 'reimbursements', label: 'Reimbursements', icon: 'receipt_long' },
+    ],
+  },
+  {
+    title: 'Financial & Compliance',
+    items: [
+      { tab: 'payslips', label: 'Payslips', icon: 'description' },
+      { tab: 'reports', label: 'Reports', icon: 'bar_chart' },
+    ],
+  },
+  {
+    title: 'System',
+    items: [
+      { tab: 'notifications', label: 'Notifications', icon: 'notifications', badgeType: 'notifications' },
+      { tab: 'settings', label: 'Settings', icon: 'settings' },
+    ],
+  },
+];
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION                                                */
+/* ========================================================================== */
 
 export const Sidebar: React.FC<SidebarProps> = ({
   currentTab,
@@ -19,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   onToggleCollapse,
   pendingApprovalsCount,
-  unreadNotificationsCount = 3,
+  unreadNotificationsCount = 0,
   user,
   onLogout,
 }) => {
@@ -30,29 +107,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
       }`}
     >
       <div className="flex flex-col flex-1 min-h-0">
-        {/* Top Logo Bar */}
+        {/* Top Logo & Header Bar */}
         {!isCollapsed ? (
           <div className="h-16 px-4 flex items-center justify-between bg-[#000f3f] shrink-0 border-b border-[#172554]/50">
             <div
-              className="flex items-center gap-2.5 cursor-pointer select-none"
+              className="flex items-center gap-3 cursor-pointer select-none group"
               onClick={() => onSelectTab('dashboard')}
             >
-              <div className="h-9 w-9 rounded-xl bg-[#006a63] flex items-center justify-center shrink-0 shadow-sm">
-                <div className="w-5 h-4 flex flex-col justify-between items-start">
-                  <span className="w-4 h-0.5 bg-white rounded-full"></span>
-                  <span className="w-4 h-0.5 bg-white rounded-full"></span>
-                  <div className="flex items-center gap-1">
-                    <span className="w-2.5 h-0.5 bg-white rounded-full"></span>
-                    <span className="w-1.5 h-1.5 bg-[#4fdbc8] rounded-full"></span>
-                  </div>
-                </div>
-              </div>
+              <PayPulseLogo size="md" variant="badge" className="group-hover:scale-105 transition-transform" />
               <div className="flex flex-col">
-                <span className="font-['Plus_Jakarta_Sans'] font-bold text-lg tracking-tight text-white leading-none">
+                <span className="font-['Plus_Jakarta_Sans'] font-bold text-xl tracking-tight text-white leading-none">
                   PayPulse
-                </span>
-                <span className="font-['Hanken_Grotesk'] font-semibold text-[0.625rem] uppercase tracking-widest text-[#808dc2] mt-0.5">
-                  ENTERPRISE
                 </span>
               </div>
             </div>
@@ -61,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               onClick={onToggleCollapse}
               aria-label="Collapse navigation"
               title="Collapse sidebar"
-              className="text-[#808dc2] hover:text-white transition-colors p-1.5 rounded-lg hover:bg-[#172554] shrink-0"
+              className="text-[#808dc2] hover:text-white transition-colors p-1.5 rounded-lg hover:bg-[#172554] shrink-0 cursor-pointer"
               type="button"
             >
               <span className="material-symbols-outlined text-[1.25rem]">menu_open</span>
@@ -69,257 +134,84 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
         ) : (
           <div className="h-16 flex items-center justify-center bg-[#000f3f] shrink-0 border-b border-[#172554]/50 px-2">
-            <div
-              className="h-10 w-10 rounded-xl bg-[#006a63] hover:bg-[#007f76] flex items-center justify-center shrink-0 shadow-md cursor-pointer transition-all active:scale-95"
-              onClick={() => onSelectTab('dashboard')}
-              title="PayPulse Enterprise (Go to Dashboard)"
-            >
-              <div className="w-5 h-4 flex flex-col justify-between items-start">
-                <span className="w-4 h-0.5 bg-white rounded-full"></span>
-                <span className="w-4 h-0.5 bg-white rounded-full"></span>
-                <div className="flex items-center gap-1">
-                  <span className="w-2.5 h-0.5 bg-white rounded-full"></span>
-                  <span className="w-1.5 h-1.5 bg-[#4fdbc8] rounded-full"></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Scrollable Navigation List */}
-        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-4">
-          {/* Expand Button when Collapsed */}
-          {isCollapsed && (
             <button
               onClick={onToggleCollapse}
               aria-label="Expand navigation"
               title="Expand sidebar"
-              className="w-full flex items-center justify-center p-2 rounded-lg text-[#808dc2] hover:text-white hover:bg-[#172554] transition-colors"
+              className="p-2 rounded-lg text-[#808dc2] hover:text-white hover:bg-[#172554] transition-colors cursor-pointer"
               type="button"
             >
               <span className="material-symbols-outlined text-[1.25rem]">menu</span>
             </button>
-          )}
-          {/* Main Section */}
-          <nav className="space-y-1">
-            {!isCollapsed && (
-              <div className="px-3 pb-1">
-                <span className="font-['Hanken_Grotesk'] text-[0.6875rem] uppercase tracking-wider text-[#808dc2] font-bold">
-                  Main
-                </span>
-              </div>
-            )}
-            <button
-              onClick={() => onSelectTab('dashboard')}
-              title={isCollapsed ? 'Dashboard' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'dashboard'
-                  ? 'bg-[#006a63] text-white font-semibold shadow-sm'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">space_dashboard</span>
-              {!isCollapsed && <span>Dashboard</span>}
-            </button>
+          </div>
+        )}
 
-            <button
-              onClick={() => onSelectTab('employees')}
-              title={isCollapsed ? 'Employees' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'employees'
-                  ? 'bg-[#006a63] text-white font-semibold shadow-sm'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">badge</span>
-              {!isCollapsed && <span>Employees</span>}
-            </button>
-
-            <button
-              onClick={() => onSelectTab('pay-runs')}
-              title={isCollapsed ? 'Pay Runs' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'pay-runs'
-                  ? 'bg-[#006a63] text-white font-semibold shadow-sm'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">payments</span>
-              {!isCollapsed && <span>Pay Runs</span>}
-            </button>
-
-            <button
-              onClick={() => onSelectTab('approvals')}
-              title={isCollapsed ? 'Approvals' : undefined}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'approvals'
-                  ? 'bg-[#006a63] text-white font-semibold shadow-sm'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[1.25rem] shrink-0">fact_check</span>
-                {!isCollapsed && <span>Approvals</span>}
-              </div>
-              {!isCollapsed && pendingApprovalsCount > 0 && (
-                <span className="px-1.5 py-0.5 rounded bg-[#172554] text-[#99efe5] font-bold text-[0.6875rem]">
-                  {pendingApprovalsCount}
-                </span>
+        {/* Scrollable Navigation Sections */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 space-y-5 scrollbar-thin">
+          {SIDEBAR_SECTIONS.map((section) => (
+            <nav key={section.title} className="space-y-1">
+              {!isCollapsed && (
+                <div className="px-3 pb-1">
+                  <span className="font-['Hanken_Grotesk'] text-[0.6875rem] uppercase tracking-wider text-[#808dc2] font-bold">
+                    {section.title}
+                  </span>
+                </div>
               )}
-            </button>
-          </nav>
 
-          {/* Workforce & Time Section */}
-          <nav className="space-y-1">
-            {!isCollapsed && (
-              <div className="px-3 pb-1">
-                <span className="font-['Hanken_Grotesk'] text-[0.6875rem] uppercase tracking-wider text-[#808dc2] font-bold">
-                  Workforce &amp; Time
-                </span>
-              </div>
-            )}
-            <button
-              onClick={() => onSelectTab('attendance')}
-              title={isCollapsed ? 'Attendance' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'attendance'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">schedule</span>
-              {!isCollapsed && <span>Attendance</span>}
-            </button>
+              {section.items.map((item) => {
+                const isActive = currentTab === item.tab;
+                const hasApprovalsBadge = item.badgeType === 'approvals' && pendingApprovalsCount > 0;
+                const hasNotificationsBadge = item.badgeType === 'notifications' && unreadNotificationsCount > 0;
 
-            <button
-              onClick={() => onSelectTab('salary-structure')}
-              title={isCollapsed ? 'Salary Structure' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'salary-structure'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">account_tree</span>
-              {!isCollapsed && <span>Salary Structure</span>}
-            </button>
+                return (
+                  <button
+                    key={item.tab}
+                    onClick={() => onSelectTab(item.tab)}
+                    title={isCollapsed ? item.label : undefined}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium relative cursor-pointer ${
+                      isActive
+                        ? 'bg-[#006a63] text-white font-semibold shadow-sm'
+                        : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="material-symbols-outlined text-[1.25rem] shrink-0">
+                        {item.icon}
+                      </span>
+                      {!isCollapsed && <span className="truncate">{item.label}</span>}
+                    </div>
 
-            <button
-              onClick={() => onSelectTab('allowances-and-deductions')}
-              title={isCollapsed ? 'Allowances & Deductions' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'allowances-and-deductions'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">price_change</span>
-              {!isCollapsed && <span>Allowances &amp; Deductions</span>}
-            </button>
+                    {/* Approvals Counter Badge */}
+                    {!isCollapsed && hasApprovalsBadge && (
+                      <span className="px-1.5 py-0.5 rounded bg-[#172554] text-[#99efe5] font-bold text-[0.6875rem] shrink-0">
+                        {pendingApprovalsCount}
+                      </span>
+                    )}
 
-            <button
-              onClick={() => onSelectTab('reimbursements')}
-              title={isCollapsed ? 'Reimbursements' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'reimbursements'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">receipt_long</span>
-              {!isCollapsed && <span>Reimbursements</span>}
-            </button>
-          </nav>
+                    {/* Notifications Counter Badge */}
+                    {!isCollapsed && hasNotificationsBadge && (
+                      <span className="px-1.5 py-0.5 rounded-full bg-[#ba1a1a] text-white font-bold text-[0.625rem] shrink-0 animate-pulse">
+                        {unreadNotificationsCount}
+                      </span>
+                    )}
 
-          {/* Financial & Compliance Section */}
-          <nav className="space-y-1">
-            {!isCollapsed && (
-              <div className="px-3 pb-1">
-                <span className="font-['Hanken_Grotesk'] text-[0.6875rem] uppercase tracking-wider text-[#808dc2] font-bold">
-                  Financial &amp; Compliance
-                </span>
-              </div>
-            )}
-            <button
-              onClick={() => onSelectTab('payslips')}
-              title={isCollapsed ? 'Payslips' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'payslips'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">description</span>
-              {!isCollapsed && <span>Payslips</span>}
-            </button>
-
-            <button
-              onClick={() => onSelectTab('reports')}
-              title={isCollapsed ? 'Reports' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'reports'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">bar_chart</span>
-              {!isCollapsed && <span>Reports</span>}
-            </button>
-          </nav>
-
-          {/* System Section */}
-          <nav className="space-y-1">
-            {!isCollapsed && (
-              <div className="px-3 pb-1">
-                <span className="font-['Hanken_Grotesk'] text-[0.6875rem] uppercase tracking-wider text-[#808dc2] font-bold">
-                  System
-                </span>
-              </div>
-            )}
-            <button
-              onClick={() => onSelectTab('notifications')}
-              title={isCollapsed ? 'Notifications' : undefined}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium relative ${
-                currentTab === 'notifications'
-                  ? 'bg-[#006a63] text-white font-semibold shadow-sm'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <div className="flex items-center gap-3">
-                <span className="material-symbols-outlined text-[1.25rem] shrink-0">notifications</span>
-                {!isCollapsed && <span>Notifications</span>}
-              </div>
-              {!isCollapsed && unreadNotificationsCount > 0 && (
-                <span className="px-1.5 py-0.5 rounded-full bg-[#ba1a1a] text-white font-bold text-[0.625rem] animate-pulse">
-                  {unreadNotificationsCount}
-                </span>
-              )}
-              {isCollapsed && unreadNotificationsCount > 0 && (
-                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#ba1a1a] ring-2 ring-[#000f3f] animate-pulse"></span>
-              )}
-            </button>
-
-            <button
-              onClick={() => onSelectTab('settings')}
-              title={isCollapsed ? 'Settings' : undefined}
-              className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors text-left font-medium ${
-                currentTab === 'settings'
-                  ? 'bg-[#006a63] text-white font-semibold'
-                  : 'text-[#808dc2] hover:bg-[#172554] hover:text-white'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[1.25rem] shrink-0">settings</span>
-              {!isCollapsed && <span>Settings</span>}
-            </button>
-          </nav>
+                    {/* Collapsed Mode Floating Notification Indicator */}
+                    {isCollapsed && hasNotificationsBadge && (
+                      <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[#ba1a1a] ring-2 ring-[#000f3f] animate-pulse"></span>
+                    )}
+                  </button>
+                );
+              })}
+            </nav>
+          ))}
         </div>
       </div>
 
-      {/* User Footer Profile */}
+      {/* User Footer Profile & Sign Out */}
       <div className="p-3 shrink-0 bg-[#172554]/40 border-t border-[#172554]/50">
         <div className="bg-[#172554] rounded-xl p-2.5 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div 
+            <div
               className="w-9 h-9 rounded-full text-white flex items-center justify-center font-bold text-xs shrink-0 ring-2 ring-[#006a63]/50 shadow-xs"
               style={{ backgroundColor: user?.avatarBg || '#006a63' }}
             >
@@ -327,10 +219,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
             </div>
             {!isCollapsed && (
               <div className="min-w-0 flex-1">
-                <div className="font-['Plus_Jakarta_Sans'] font-semibold text-white text-sm truncate" title={user?.name || 'User Profile'}>
+                <div
+                  className="font-['Plus_Jakarta_Sans'] font-semibold text-white text-sm truncate"
+                  title={user?.name || 'User Profile'}
+                >
                   {user?.name || 'User Profile'}
                 </div>
-                <div className="font-['Hanken_Grotesk'] text-[0.6875rem] text-[#808dc2] truncate" title={user?.role || 'Admin'}>
+                <div
+                  className="font-['Hanken_Grotesk'] text-[0.6875rem] text-[#808dc2] truncate"
+                  title={user?.role || 'Admin'}
+                >
                   {user?.role || 'HR Payroll Director'}
                 </div>
               </div>

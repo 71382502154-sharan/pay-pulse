@@ -1,6 +1,20 @@
+/**
+ * ============================================================================
+ * PAYPULSE ENTERPRISE — PAY RUN EXECUTION ENGINE
+ * ============================================================================
+ * Institutional 8-stage pay run processor supporting batch adjustments, inline
+ * bonus editing, statutory LOP recalculation, discrepancy resolution hooks,
+ * and encrypted escrow disbursement file generation.
+ * ============================================================================
+ */
+
 import React, { useState } from 'react';
 import { EmployeeRow } from '../types';
 import { exportReconciliationLedger } from '../utils/downloadUtils';
+
+/* ========================================================================== */
+/* 1. TYPES & PROPS                                                           */
+/* ========================================================================== */
 
 interface PayRunExecutionViewProps {
   onBackToDashboard: () => void;
@@ -11,9 +25,15 @@ interface PayRunExecutionViewProps {
   onOpenAddAllowance: () => void;
   onOpenDiscrepancies: () => void;
   onShowToast: (msg: string) => void;
+  isCollapsed?: boolean;
+  isDark?: boolean;
 }
 
 type TabCategory = 'All Employees' | 'Special Allowances' | 'Reimbursements' | 'Variable Bonus' | 'Unpaid Leave (LOP)';
+
+/* ========================================================================== */
+/* 2. COMPONENT IMPLEMENTATION & STEPPER CONFIGURATION                        */
+/* ========================================================================== */
 
 export const PayRunExecutionView: React.FC<PayRunExecutionViewProps> = ({
   onBackToDashboard,
@@ -24,6 +44,8 @@ export const PayRunExecutionView: React.FC<PayRunExecutionViewProps> = ({
   onOpenAddAllowance,
   onOpenDiscrepancies,
   onShowToast,
+  isCollapsed = false,
+  isDark = false,
 }) => {
   const [activeStep, setActiveStep] = useState<number>(4);
   const [activeTab, setActiveTab] = useState<TabCategory>('All Employees');
@@ -856,14 +878,24 @@ export const PayRunExecutionView: React.FC<PayRunExecutionViewProps> = ({
         </div>
       </div>
 
-      {/* Sticky Bottom Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-[#eaedff] px-6 py-3.5 z-40 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+      {/* Sticky Bottom Action Bar with Dynamic Sidebar Offset & Theme Responsive Colors */}
+      <div className={`fixed bottom-0 right-0 backdrop-blur-md border-t px-6 py-3.5 z-40 transition-all duration-300 ${
+        isCollapsed ? 'left-20' : 'left-72'
+      } ${
+        isDark 
+          ? 'bg-[#000f3f]/95 border-[#172554] text-white shadow-[0_-4px_24px_rgba(0,0,0,0.6)]' 
+          : 'bg-white/95 border-[#eaedff] text-[#131b2e] shadow-[0_-4px_16px_rgba(0,0,0,0.06)]'
+      }`}>
         <div className="max-w-[1600px] mx-auto flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={() => onShowToast('March 2025 Pay Run Draft Saved Successfully')}
               type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-[#eaedff] text-[#131b2e] hover:bg-[#f2f3ff] transition-all text-xs font-semibold"
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border transition-all text-xs font-semibold cursor-pointer shadow-sm ${
+                isDark
+                  ? 'bg-[#172554] border-[#25356e] text-white hover:bg-[#20316b]'
+                  : 'bg-white border-[#eaedff] text-[#131b2e] hover:bg-[#f2f3ff]'
+              }`}
             >
               <span className="material-symbols-outlined text-[1.125rem]">save</span>
               <span>Save Draft</span>
@@ -874,7 +906,11 @@ export const PayRunExecutionView: React.FC<PayRunExecutionViewProps> = ({
                 onShowToast('Downloaded Reconciliation Ledger spreadsheet (CSV/Excel)');
               }}
               type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-[#eaedff] text-[#131b2e] hover:bg-[#f2f3ff] transition-all text-xs font-semibold active:scale-95"
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border transition-all text-xs font-semibold active:scale-95 cursor-pointer shadow-sm ${
+                isDark
+                  ? 'bg-[#172554] border-[#25356e] text-white hover:bg-[#20316b]'
+                  : 'bg-white border-[#eaedff] text-[#131b2e] hover:bg-[#f2f3ff]'
+              }`}
             >
               <span className="material-symbols-outlined text-[1.125rem]">table_view</span>
               <span>Download Reconciliation Excel</span>
@@ -885,7 +921,11 @@ export const PayRunExecutionView: React.FC<PayRunExecutionViewProps> = ({
                 onShowToast('Step 4 values reset to baseline lock');
               }}
               type="button"
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white border border-[#eaedff] text-[#ba1a1a] hover:bg-[#ffdad6]/40 transition-all text-xs font-semibold"
+              className={`inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border transition-all text-xs font-semibold cursor-pointer shadow-sm ${
+                isDark
+                  ? 'bg-[#ba1a1a]/20 border-[#ba1a1a]/50 text-[#ffdad6] hover:bg-[#ba1a1a]/35'
+                  : 'bg-white border-[#eaedff] text-[#ba1a1a] hover:bg-[#ffdad6]/40'
+              }`}
             >
               <span className="material-symbols-outlined text-[1.125rem]">restart_alt</span>
               <span>Reset Current Step</span>
@@ -894,10 +934,10 @@ export const PayRunExecutionView: React.FC<PayRunExecutionViewProps> = ({
 
           <div className="flex items-center justify-between sm:justify-end gap-5">
             <div className="hidden md:flex flex-col text-right">
-              <span className="text-xs font-semibold text-[#131b2e]">
+              <span className={`text-xs font-semibold ${isDark ? 'text-white' : 'text-[#131b2e]'}`}>
                 Step {activeStep} of 8 Completed
               </span>
-              <span className="text-[0.6875rem] text-[#006a63] font-medium">
+              <span className={`text-[0.6875rem] font-medium ${isDark ? 'text-[#71f8e4]' : 'text-[#006a63]'}`}>
                 Ready for Statutory Deductions
               </span>
             </div>
@@ -906,7 +946,11 @@ export const PayRunExecutionView: React.FC<PayRunExecutionViewProps> = ({
               <button
                 onClick={() => setActiveStep((s) => Math.max(1, s - 1))}
                 type="button"
-                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#eaedff] text-[#131b2e] hover:bg-[#dae2fd] text-xs font-semibold transition-all"
+                className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  isDark
+                    ? 'bg-[#172554] border border-[#25356e] text-white hover:bg-[#20316b]'
+                    : 'bg-[#eaedff] text-[#131b2e] hover:bg-[#dae2fd]'
+                }`}
               >
                 <span className="material-symbols-outlined text-[1.125rem]">arrow_back</span>
                 <span>Previous Step</span>
@@ -922,7 +966,7 @@ export const PayRunExecutionView: React.FC<PayRunExecutionViewProps> = ({
                   }
                 }}
                 type="button"
-                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#006a63] text-white hover:bg-[#00504a] text-xs font-semibold shadow-md transition-all active:scale-95"
+                className="inline-flex items-center gap-1.5 px-5 py-2 rounded-lg bg-[#006a63] hover:bg-[#00504a] text-white text-xs font-semibold shadow-md transition-all active:scale-95 cursor-pointer"
               >
                 <span>Proceed to Statutory Deductions</span>
                 <span className="material-symbols-outlined text-[1.125rem]">arrow_forward</span>
