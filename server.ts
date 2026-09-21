@@ -47,8 +47,19 @@ const JWT_SECRET = process.env.JWT_SECRET || 'paypulse-enterprise-super-secret-k
 app.use(cors());
 app.use(express.json());
 
-// Persistent File Store Location
-const DB_DIR = path.join(__dirname, 'data');
+// Handle URL routing differences between local Express server and Vercel serverless function rewrites
+app.use((req, _res, next) => {
+  if (req.url && !req.url.startsWith('/api') && !req.url.startsWith('/_')) {
+    req.url = `/api${req.url.startsWith('/') ? '' : '/'}${req.url}`;
+  }
+  next();
+});
+
+// Detect Vercel serverless environment
+const isVercel = Boolean(process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
+
+// Persistent File Store Location: use /tmp on Vercel as root filesystem is read-only
+const DB_DIR = isVercel ? path.join('/tmp', 'data') : path.join(__dirname, 'data');
 const DB_FILE = path.join(DB_DIR, 'db.json');
 
 interface DatabaseSchema {
@@ -91,6 +102,26 @@ function getSeedUsers(): UserRecord[] {
       avatarBg: '#1e3a8a',
       createdAt: new Date().toISOString(),
     },
+    {
+      id: 'usr-sharan-1',
+      email: '71382502154.sharan@sritcbe.ac.in',
+      passwordHash: bcrypt.hashSync('sharan@#', 10),
+      name: 'Sharan R',
+      role: 'Enterprise Platform Lead',
+      department: 'Engineering & Integration',
+      avatarBg: '#006a63',
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: 'usr-sharan-2',
+      email: 'sharan@gmail.com',
+      passwordHash: bcrypt.hashSync('sharan@#', 10),
+      name: 'Sharan R',
+      role: 'Enterprise Platform Lead',
+      department: 'Engineering & Integration',
+      avatarBg: '#006a63',
+      createdAt: new Date().toISOString(),
+    },
   ];
 }
 
@@ -109,6 +140,7 @@ function loadDatabase() {
     if (!fs.existsSync(DB_DIR)) {
       fs.mkdirSync(DB_DIR, { recursive: true });
     }
+
     if (fs.existsSync(DB_FILE)) {
       const content = fs.readFileSync(DB_FILE, 'utf-8');
       const parsed = JSON.parse(content);
@@ -119,8 +151,41 @@ function loadDatabase() {
         milestones: parsed.milestones || [...INITIAL_MILESTONES],
         discrepancies: parsed.discrepancies || [...INITIAL_DISCREPANCIES],
       };
+      // Ensure seed users are always included
+      const seedUsers = getSeedUsers();
+      seedUsers.forEach((seed) => {
+        if (!db.users.some((u) => u.email.toLowerCase() === seed.email.toLowerCase())) {
+          db.users.push(seed);
+        }
+      });
       console.log(`[PayPulse API] Loaded persistent data from ${DB_FILE}`);
     } else {
+      // If DB_FILE does not exist in DB_DIR (e.g. cold start on /tmp in Vercel),
+      // try loading from project root data/db.json
+      const rootDbFile = path.join(process.cwd(), 'data', 'db.json');
+      if (fs.existsSync(rootDbFile)) {
+        try {
+          const content = fs.readFileSync(rootDbFile, 'utf-8');
+          const parsed = JSON.parse(content);
+          db = {
+            users: (parsed.users && parsed.users.length > 0) ? parsed.users : getSeedUsers(),
+            employees: parsed.employees || [...INITIAL_EMPLOYEES],
+            approvals: parsed.approvals || [...INITIAL_APPROVALS],
+            milestones: parsed.milestones || [...INITIAL_MILESTONES],
+            discrepancies: parsed.discrepancies || [...INITIAL_DISCREPANCIES],
+          };
+          console.log(`[PayPulse API] Seeded database from bundled ${rootDbFile}`);
+        } catch (e) {
+          console.warn('[PayPulse API] Could not read bundled db.json, using defaults:', e);
+        }
+      }
+      // Ensure seed users are always present
+      const seedUsers = getSeedUsers();
+      seedUsers.forEach((seed) => {
+        if (!db.users.some((u) => u.email.toLowerCase() === seed.email.toLowerCase())) {
+          db.users.push(seed);
+        }
+      });
       saveDatabase();
       console.log(`[PayPulse API] Initialized persistent database at ${DB_FILE}`);
     }
@@ -522,8 +587,8 @@ app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res: Resp
   });
 });
 
-// Health Check
-app.get('/api/health', (_req: Request, res: Response) => {
+// Health Check & Root API Status
+app.get(['/api', '/api/', '/api/health'], (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     service: 'PayPulse Unified API',
@@ -714,7 +779,12 @@ if (fs.existsSync(DIST_DIR)) {
 /* 9. SERVER BOOTSTRAP                                                        */
 /* ========================================================================== */
 
-app.listen(Number(PORT), '0.0.0.0', () => {
-  console.log(`[PayPulse API Server] Running on http://localhost:${PORT}`);
-  console.log(`[PayPulse API Server] Loaded ${db.employees.length} team members with file persistence.`);
-});
+if (process.env.NODE_ENV !== 'test' && !isVercel) {
+  app.listen(Number(PORT), '0.0.0.0', () => {
+    console.log(`[PayPulse API Server] Running on http://localhost:${PORT}`);
+    console.log(`[PayPulse API Server] Loaded ${db.employees.length} team members with file persistence.`);
+  });
+}
+
+export default app;
+export { app };

@@ -113,15 +113,29 @@ export default function App() {
             setCurrentUser(authedUser);
             localStorage.setItem('paypulse_auth_user', JSON.stringify(authedUser));
           }
-        } else {
-          // Token expired or invalid on server
+        } else if (response.status === 401 || response.status === 403) {
+          // Token explicitly expired or invalidated by server
           console.warn('Authentication token expired or invalidated; logging out.');
           localStorage.removeItem('paypulse_auth_token');
           localStorage.removeItem('paypulse_auth_user');
           setCurrentUser(null);
+        } else {
+          // Server offline or returned 404/500: preserve existing session from localStorage
+          const savedUser = localStorage.getItem('paypulse_auth_user');
+          if (savedUser) {
+            try {
+              setCurrentUser(JSON.parse(savedUser));
+            } catch {}
+          }
         }
       } catch (e) {
         console.warn('Backend server offline during session check:', e);
+        const savedUser = localStorage.getItem('paypulse_auth_user');
+        if (savedUser) {
+          try {
+            setCurrentUser(JSON.parse(savedUser));
+          } catch {}
+        }
       }
     };
 

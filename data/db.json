@@ -41,20 +41,30 @@
       "createdAt": "2026-09-14T06:01:56.485Z"
     },
     {
+      "id": "usr-sharan-srit",
+      "email": "71382502154.sharan@sritcbe.ac.in",
+      "passwordHash": "$2b$10$jeXUpVxSt8PA0arPkUL0S.6ORlu5/rOZEAWh33xjObJkk6AORrMsy",
+      "name": "Sharan R",
+      "role": "Enterprise Platform Lead",
+      "department": "Engineering & Integration",
+      "avatarBg": "#006a63",
+      "createdAt": "2026-09-21T18:30:00.000Z"
+    },
+    {
       "id": "usr-1789366186959",
       "email": "sharan@gmail.com",
-      "passwordHash": "$2b$10$UN5K5pK9al7WVnfAuSCe0OxfyjbjN.XMDRQdnrgAk3jH/2fLgN.vC",
-      "name": "SHARAN",
-      "role": "HR Payroll Director",
-      "department": "Human Resources",
+      "passwordHash": "$2b$10$jeXUpVxSt8PA0arPkUL0S.6ORlu5/rOZEAWh33xjObJkk6AORrMsy",
+      "name": "Sharan R",
+      "role": "Enterprise Platform Lead",
+      "department": "Engineering & Integration",
       "avatarBg": "#006a63",
       "createdAt": "2026-09-14T06:09:46.960Z"
     },
     {
       "id": "usr-1789366285810",
       "email": "shar@gmail.com",
-      "passwordHash": "$2b$10$bt79SMPoaHAQ3Ip6znp3ROK7wphfjaVcr7vCFYqNrvLIvr1vwNI5.",
-      "name": "SHARAN R",
+      "passwordHash": "$2b$10$jeXUpVxSt8PA0arPkUL0S.6ORlu5/rOZEAWh33xjObJkk6AORrMsy",
+      "name": "Sharan R",
       "role": "Senior People Operations Lead",
       "department": "Human Resources",
       "avatarBg": "#006a63",

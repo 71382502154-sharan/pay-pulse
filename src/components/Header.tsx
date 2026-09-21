@@ -312,84 +312,93 @@ export const Header: React.FC<HeaderProps> = ({
                 </div>
 
                 <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
-                  {(notifications && notifications.length > 0 ? notifications.slice(0, 5) : FALLBACK_NOTIFICATIONS).map((item) => {
-                    const style = getCategoryBadge(item.category);
-                    const isExpanded = expandedNotifId === item.id;
-                    return (
-                      <div
-                        key={item.id}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setExpandedNotifId(isExpanded ? null : item.id);
-                          if (!item.read && onToggleNotificationRead) {
-                            onToggleNotificationRead(item.id);
-                          }
-                        }}
-                        className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
-                          !item.read
-                            ? `${style.cardUnreadBg} shadow-xs`
-                            : 'bg-white/90 dark:bg-slate-900/60 border-slate-200/80 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-700'
-                        }`}
-                      >
-                        <div className="flex items-start gap-2.5">
-                          {/* Category Icon */}
-                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${style.iconBg}`}>
-                            <span className="material-symbols-outlined text-[1.05rem]">
-                              {style.icon}
-                            </span>
-                          </div>
-
-                          {/* Details */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center justify-between gap-1 mb-0.5">
-                              <span className={`text-[0.5625rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${style.badge}`}>
-                                {style.label}
-                              </span>
-                              <span className="text-slate-400 dark:text-slate-500 text-[0.625rem] whitespace-nowrap">
-                                {item.timestamp}
+                  {notifications && notifications.length > 0 ? (
+                    notifications.slice(0, 5).map((item) => {
+                      const style = getCategoryBadge(item.category);
+                      const isExpanded = expandedNotifId === item.id;
+                      return (
+                        <div
+                          key={item.id}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setExpandedNotifId(isExpanded ? null : item.id);
+                            if (!item.read && onToggleNotificationRead) {
+                              onToggleNotificationRead(item.id);
+                            }
+                          }}
+                          className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
+                            !item.read
+                              ? `${style.cardUnreadBg} shadow-xs`
+                              : 'bg-white dark:bg-slate-900 border-slate-200/80 dark:border-slate-800 opacity-75 hover:opacity-100'
+                          }`}
+                        >
+                          <div className="flex items-start gap-2.5">
+                            {/* Icon */}
+                            <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${style.iconBg}`}>
+                              <span className="material-symbols-outlined text-[1rem]">
+                                {style.icon}
                               </span>
                             </div>
 
-                            <div className="font-semibold text-slate-900 dark:text-white text-xs leading-snug">
-                              {item.title}
-                            </div>
-
-                            <p className={`text-slate-600 dark:text-slate-300 text-[0.6875rem] mt-1 leading-relaxed ${
-                              isExpanded ? '' : 'line-clamp-2'
-                            }`}>
-                              {item.description}
-                            </p>
-
-                            {item.impact && (
-                              <div className={`text-[0.625rem] mt-1.5 font-medium px-2 py-1 rounded-lg border ${style.impact}`}>
-                                {item.impact}
-                              </div>
-                            )}
-
-                            {item.actionLabel && (
-                              <div className="mt-2 pt-1.5 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
-                                <span className="text-[0.625rem] text-slate-400 dark:text-slate-500">
-                                  {isExpanded ? 'Expanded details' : 'Tap to expand'}
+                            {/* Details */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-1 mb-0.5">
+                                <span className={`text-[0.5625rem] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded border ${style.badge}`}>
+                                  {style.label}
                                 </span>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    setShowNotifications(false);
-                                    onSelectTab('notifications');
-                                  }}
-                                  className={`text-[0.6875rem] font-bold hover:underline flex items-center gap-0.5 cursor-pointer ${style.action}`}
-                                >
-                                  <span>{item.actionLabel}</span>
-                                  <span className="material-symbols-outlined text-[0.8rem]">arrow_forward</span>
-                                </button>
+                                <span className="text-slate-400 dark:text-slate-500 text-[0.625rem] whitespace-nowrap">
+                                  {item.timestamp}
+                                </span>
                               </div>
-                            )}
+
+                              <div className="font-semibold text-slate-900 dark:text-white text-xs leading-snug">
+                                {item.title}
+                              </div>
+
+                              <p className={`text-slate-600 dark:text-slate-300 text-[0.6875rem] mt-1 leading-relaxed ${
+                                isExpanded ? '' : 'line-clamp-2'
+                              }`}>
+                                {item.description}
+                              </p>
+
+                              {item.impact && (
+                                <div className={`text-[0.625rem] mt-1.5 font-medium px-2 py-1 rounded-lg border ${style.impact}`}>
+                                  {item.impact}
+                                </div>
+                              )}
+
+                              {item.actionLabel && (
+                                <div className="mt-2 pt-1.5 border-t border-slate-200/60 dark:border-slate-800 flex items-center justify-between">
+                                  <button
+                                    type="button"
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      setShowNotifications(false);
+                                      if (item.actionTab) {
+                                        onSelectTab(item.actionTab);
+                                      } else if (item.category === 'critical' || item.category === 'fiduciary') {
+                                        onSelectTab('discrepancies');
+                                      } else {
+                                        onSelectTab('notifications');
+                                      }
+                                    }}
+                                    className={`text-[0.6875rem] font-bold hover:underline flex items-center gap-0.5 cursor-pointer ${style.action}`}
+                                  >
+                                    <span>{item.actionLabel}</span>
+                                    <span className="material-symbols-outlined text-[0.8rem]">arrow_forward</span>
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  })}
+                      );
+                    })
+                  ) : (
+                    <div className="py-8 text-center text-xs text-slate-400">
+                      No notifications to display
+                    </div>
+                  )}
                 </div>
 
                 <div className="pt-2.5 border-t border-slate-200 dark:border-slate-800 mt-2.5 text-center">
