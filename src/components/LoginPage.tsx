@@ -27,33 +27,55 @@ type AuthMode = 'signin' | 'register';
 
 interface DemoAccount {
   label: string;
+  name: string;
   role: string;
   email: string;
   pass: string;
   badge: string;
+  department: string;
+  avatarBg: string;
 }
 
 const DEMO_ACCOUNTS: DemoAccount[] = [
   {
+    label: 'Lead Architect',
+    name: 'Sharan R',
+    role: 'Enterprise Platform Lead',
+    email: '71382502154.sharan@sritcbe.ac.in',
+    pass: 'sharan@#',
+    badge: 'Architect',
+    department: 'Engineering & Integration',
+    avatarBg: '#006a63',
+  },
+  {
     label: 'HR Director',
-    role: 'Full Admin',
+    name: 'Sashmitha S M',
+    role: 'HR Payroll Director',
     email: 'admin@paypulse.corp',
     pass: 'Admin@123',
     badge: 'Director',
+    department: 'People Operations',
+    avatarBg: '#000f3f',
   },
   {
     label: 'Finance Lead',
-    role: 'Disbursements',
+    name: 'Seashora R',
+    role: 'Chief Financial Controller',
     email: 'finance@paypulse.corp',
     pass: 'Finance@123',
     badge: 'Controller',
+    department: 'Finance & Accounts',
+    avatarBg: '#006a63',
   },
   {
     label: 'Auditor',
-    role: 'Compliance',
+    name: 'Sathana G',
+    role: 'Compliance & Statutory Auditor',
     email: 'audit@paypulse.corp',
     pass: 'Audit@123',
     badge: 'Auditor',
+    department: 'Internal Audit',
+    avatarBg: '#1e3a8a',
   },
 ];
 
@@ -100,12 +122,12 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onBackToLanding }
     return () => window.removeEventListener('paypulse-theme-change', handleExternalThemeChange);
   }, []);
 
-  // Form states
-  const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('admin@paypulse.corp');
-  const [password, setPassword] = useState('Admin@123');
-  const [role, setRole] = useState('Senior People Operations Lead');
-  const [department, setDepartment] = useState('Human Resources');
+  // Form states - defaulted to Sharan R credentials
+  const [fullName, setFullName] = useState('Sharan R');
+  const [email, setEmail] = useState('71382502154.sharan@sritcbe.ac.in');
+  const [password, setPassword] = useState('sharan@#');
+  const [role, setRole] = useState('Enterprise Platform Lead');
+  const [department, setDepartment] = useState('Engineering & Integration');
 
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
@@ -117,8 +139,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onBackToLanding }
     setMode('signin');
     setEmail(acc.email);
     setPassword(acc.pass);
+    setFullName(acc.name);
+    setRole(acc.role);
+    setDepartment(acc.department);
     setErrorMessage('');
-    setSuccessMessage(`Loaded ${acc.label} credentials. Click "Sign In" below.`);
+    setSuccessMessage(`Selected ${acc.name} (${acc.label}). Click "Sign In" below.`);
     setTimeout(() => setSuccessMessage(''), 2500);
   };
 
@@ -210,9 +235,9 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onBackToLanding }
       let fallbackDept = mode === 'register' ? department.trim() : '';
 
       if (matchedDemo) {
-        fallbackName = matchedDemo.label;
+        fallbackName = matchedDemo.name;
         fallbackRole = matchedDemo.role;
-        fallbackDept = 'Executive Operations';
+        fallbackDept = matchedDemo.department;
       } else if (!fallbackName) {
         if (normalizedEmail.includes('sharan')) {
           fallbackName = 'Sharan R';
@@ -232,7 +257,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onBackToLanding }
         email: email.trim(),
         role: fallbackRole || 'Enterprise Lead',
         department: fallbackDept || 'Operations',
-        avatarBg: '#006a63',
+        avatarBg: matchedDemo?.avatarBg || (normalizedEmail.includes('sharan') ? '#006a63' : '#000f3f'),
       };
       const fallbackToken = `paypulse-session-${Date.now()}`;
 
@@ -432,37 +457,53 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLogin, onBackToLanding }
                   <span className={`text-[0.625rem] font-medium ${
                     isDark ? 'text-slate-400' : 'text-[#767680]'
                   }`}>
-                    Default Password: Admin@123
+                    Click profile to auto-fill credentials
                   </span>
                 </div>
-                <div className="grid grid-cols-3 gap-2">
-                  {DEMO_ACCOUNTS.map((acc) => (
-                    <button
-                      key={acc.label}
-                      type="button"
-                      onClick={() => handleSelectDemo(acc)}
-                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer group ${
-                        isDark 
-                          ? 'bg-[#111827] hover:bg-[#1a2333] border-[#1e293b] hover:border-teal-500' 
-                          : 'bg-white hover:bg-[#eaedff]/60 border-[#eaedff] hover:border-[#006a63] shadow-xs'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-1 mb-0.5">
-                        <span className={`font-['Plus_Jakarta_Sans'] font-bold text-xs truncate ${
-                          isDark 
-                            ? 'text-white group-hover:text-teal-300' 
-                            : 'text-[#131b2e] group-hover:text-[#006a63]'
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {DEMO_ACCOUNTS.map((acc) => {
+                    const isSelected = email.toLowerCase() === acc.email.toLowerCase();
+                    return (
+                      <button
+                        key={acc.label}
+                        type="button"
+                        onClick={() => handleSelectDemo(acc)}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer group relative ${
+                          isSelected
+                            ? isDark
+                              ? 'bg-teal-950/40 border-teal-500 shadow-sm'
+                              : 'bg-teal-50/80 border-[#006a63] shadow-xs'
+                            : isDark 
+                              ? 'bg-[#111827] hover:bg-[#1a2333] border-[#1e293b] hover:border-teal-500' 
+                              : 'bg-white hover:bg-[#eaedff]/60 border-[#eaedff] hover:border-[#006a63] shadow-xs'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between gap-1 mb-0.5">
+                          <span className={`font-['Plus_Jakarta_Sans'] font-bold text-xs truncate ${
+                            isSelected
+                              ? isDark ? 'text-teal-300' : 'text-[#006a63]'
+                              : isDark 
+                                ? 'text-white group-hover:text-teal-300' 
+                                : 'text-[#131b2e] group-hover:text-[#006a63]'
+                          }`}>
+                            {acc.label}
+                          </span>
+                        </div>
+                        <div className={`text-xs font-semibold truncate ${
+                          isSelected
+                            ? isDark ? 'text-teal-200' : 'text-[#00504a]'
+                            : isDark ? 'text-slate-200' : 'text-slate-700'
                         }`}>
-                          {acc.label}
-                        </span>
-                      </div>
-                      <div className={`text-[0.625rem] truncate font-medium ${
-                        isDark ? 'text-slate-400' : 'text-[#767680]'
-                      }`}>
-                        {acc.role}
-                      </div>
-                    </button>
-                  ))}
+                          {acc.name}
+                        </div>
+                        <div className={`text-[0.625rem] truncate font-medium ${
+                          isDark ? 'text-slate-400' : 'text-[#767680]'
+                        }`}>
+                          {acc.role}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

@@ -12,7 +12,7 @@
  * ============================================================================
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationTab, EmployeeRow, UserProfile } from '../types';
 import { downloadStatutoryReport } from '../utils/downloadUtils';
 import { INITIAL_EMPLOYEES } from '../data/payrollData';
@@ -24,6 +24,7 @@ import { getInitials } from '../utils/userUtils';
 
 interface AuxiliaryViewsProps {
   currentTab: NavigationTab;
+  onSelectTab: (tab: NavigationTab) => void;
   onShowToast: (msg: string) => void;
   onNavigateToPayRun: () => void;
   employees?: EmployeeRow[];
@@ -37,6 +38,7 @@ interface AuxiliaryViewsProps {
 
 export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
   currentTab,
+  onSelectTab,
   onShowToast,
   onNavigateToPayRun,
   employees = INITIAL_EMPLOYEES,
@@ -47,6 +49,15 @@ export const AuxiliaryViews: React.FC<AuxiliaryViewsProps> = ({
   const [profileEmail, setProfileEmail] = useState(user?.email || '');
   const [profileRole, setProfileRole] = useState(user?.role || '');
   const [profileDept, setProfileDept] = useState(user?.department || '');
+
+  useEffect(() => {
+    if (user) {
+      setProfileName(user.name || '');
+      setProfileEmail(user.email || '');
+      setProfileRole(user.role || '');
+      setProfileDept(user.department || '');
+    }
+  }, [user]);
 
   /* ------------------------------------------------------------------------ */
   /* TAB: SALARY STRUCTURE & STATUTORY BANDS                                  */
