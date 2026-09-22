@@ -208,19 +208,6 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Right: Quick Action Buttons & Controls */}
       <div className="flex items-center gap-4">
-        {/* Backend Connectivity Status Pill */}
-        <div 
-          className={`hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.6875rem] font-medium font-['Hanken_Grotesk'] border transition-colors ${
-            isBackendConnected 
-              ? 'bg-[#e8f5e9] text-[#1b5e20] border-[#c8e6c9]' 
-              : 'bg-[#fff3e0] text-[#e65100] border-[#ffe0b2]'
-          }`}
-          title={isBackendConnected ? "Connected to Express Backend & db.json" : "Using local fallback data"}
-        >
-          <span className={`w-1.5 h-1.5 rounded-full ${isBackendConnected ? 'bg-[#2e7d32] animate-pulse' : 'bg-[#f57c00]'}`}></span>
-          <span>{isBackendConnected ? 'Backend Live' : 'Offline Mode'}</span>
-        </div>
-
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenNewPayRun}
