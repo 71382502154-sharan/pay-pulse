@@ -12,7 +12,6 @@ import React, { useState } from 'react';
 import { ApprovalItem, MilestoneEvent, NavigationTab, EmployeeRow, UserProfile } from '../types';
 import { exportReconciliationLedger } from '../utils/downloadUtils';
 import { INITIAL_EMPLOYEES } from '../data/payrollData';
-import { BackendStatusButton } from './BackendStatusButton';
 
 /* ========================================================================== */
 /* 1. TYPES & PROPS                                                           */
@@ -81,12 +80,6 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
 
           <div className="flex items-center gap-3 flex-wrap shrink-0">
-            <BackendStatusButton
-              isBackendConnected={isBackendConnected}
-              onRefresh={onRefreshBackend}
-              onShowToast={onShowToast}
-              variant="dashboard"
-            />
             <button
               onClick={() => {
                 exportReconciliationLedger(employees);
