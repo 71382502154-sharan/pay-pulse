@@ -12,6 +12,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { NavigationTab, UserProfile, NotificationItem } from '../types';
 import { getInitials } from '../utils/userUtils';
 import { PayPulseLogo } from './PayPulseLogo';
+import { BackendStatusButton } from './BackendStatusButton';
 
 /* ========================================================================== */
 /* 1. TYPES & CATEGORY BADGE HELPERS                                          */
@@ -28,6 +29,8 @@ interface HeaderProps {
   onToggleTheme: () => void;
   isCollapsed: boolean;
   isBackendConnected?: boolean;
+  onRefreshBackend?: () => Promise<void> | void;
+  onShowToast?: (msg: string) => void;
   unreadNotificationsCount?: number;
   notifications?: NotificationItem[];
   onToggleNotificationRead?: (id: string) => void;
@@ -96,6 +99,8 @@ export const Header: React.FC<HeaderProps> = ({
   onToggleTheme,
   isCollapsed,
   isBackendConnected = false,
+  onRefreshBackend,
+  onShowToast,
   unreadNotificationsCount = 3,
   notifications = [],
   onToggleNotificationRead,
@@ -207,7 +212,15 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right: Quick Action Buttons & Controls */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 sm:gap-4">
+        {/* Backend Online Status Button */}
+        <BackendStatusButton
+          isBackendConnected={isBackendConnected}
+          onRefresh={onRefreshBackend}
+          onShowToast={onShowToast}
+          variant="header"
+        />
+
         <div className="flex items-center gap-2">
           <button
             onClick={onOpenNewPayRun}

@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import { ApprovalItem, MilestoneEvent, NavigationTab, EmployeeRow, UserProfile } from '../types';
 import { exportReconciliationLedger } from '../utils/downloadUtils';
 import { INITIAL_EMPLOYEES } from '../data/payrollData';
+import { BackendStatusButton } from './BackendStatusButton';
 
 /* ========================================================================== */
 /* 1. TYPES & PROPS                                                           */
@@ -28,6 +29,8 @@ interface DashboardViewProps {
   onShowToast: (msg: string) => void;
   employees?: EmployeeRow[];
   user?: UserProfile;
+  isBackendConnected?: boolean;
+  onRefreshBackend?: () => Promise<void> | void;
 }
 
 /* ========================================================================== */
@@ -45,6 +48,8 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onShowToast,
   employees = INITIAL_EMPLOYEES,
   user,
+  isBackendConnected = true,
+  onRefreshBackend,
 }) => {
   const [previewApproval, setPreviewApproval] = useState<ApprovalItem | null>(null);
 
@@ -76,6 +81,12 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
 
           <div className="flex items-center gap-3 flex-wrap shrink-0">
+            <BackendStatusButton
+              isBackendConnected={isBackendConnected}
+              onRefresh={onRefreshBackend}
+              onShowToast={onShowToast}
+              variant="dashboard"
+            />
             <button
               onClick={() => {
                 exportReconciliationLedger(employees);

@@ -8,7 +8,7 @@
  * ============================================================================
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { NavigationTab, EmployeeRow, ApprovalItem, MilestoneEvent, DiscrepancyEmployee, NotificationItem, UserProfile } from './types';
 import {
@@ -286,29 +286,29 @@ export default function App() {
   };
 
   // Fetch initial data from backend API
-  useEffect(() => {
-    const fetchBackendData = async () => {
-      try {
-        const response = await fetch('/api/payroll/all', {
-          headers: getAuthHeaders(),
-        });
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const result = await response.json();
-        if (result.success && result.data) {
-          setEmployees(result.data.employees);
-          setApprovals(result.data.approvals);
-          setMilestones(result.data.milestones);
-          setDiscrepancies(result.data.discrepancies);
-          setIsBackendConnected(true);
-        }
-      } catch (err) {
-        console.warn('Backend server offline or unreachable; loaded local fallback data.', err);
-        setIsBackendConnected(false);
+  const fetchBackendData = useCallback(async () => {
+    try {
+      const response = await fetch('/api/payroll/all', {
+        headers: getAuthHeaders(),
+      });
+      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+      const result = await response.json();
+      if (result.success && result.data) {
+        setEmployees(result.data.employees);
+        setApprovals(result.data.approvals);
+        setMilestones(result.data.milestones);
+        setDiscrepancies(result.data.discrepancies);
+        setIsBackendConnected(true);
       }
-    };
-
-    fetchBackendData();
+    } catch (err) {
+      console.warn('Backend server offline or unreachable; loaded local fallback data.', err);
+      setIsBackendConnected(false);
+    }
   }, [currentUser]);
+
+  useEffect(() => {
+    fetchBackendData();
+  }, [fetchBackendData]);
 
   // Handlers with Backend Sync
   const handleUpdateEmployeeBonus = async (id: string, newBonus: number) => {
@@ -546,6 +546,8 @@ export default function App() {
               }}
               isCollapsed={isCollapsed}
               isBackendConnected={isBackendConnected}
+              onRefreshBackend={fetchBackendData}
+              onShowToast={showToast}
               unreadNotificationsCount={unreadNotificationsCount}
               notifications={notifications}
               onToggleNotificationRead={handleToggleReadNotification}
@@ -579,6 +581,8 @@ export default function App() {
                       onShowToast={showToast}
                       employees={employees}
                       user={currentUser || undefined}
+                      isBackendConnected={isBackendConnected}
+                      onRefreshBackend={fetchBackendData}
                     />
                   )}
 

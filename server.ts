@@ -588,13 +588,34 @@ app.get('/api/auth/me', authenticateToken, (req: AuthenticatedRequest, res: Resp
 });
 
 // Health Check & Root API Status
-app.get(['/api', '/api/', '/api/health'], (_req: Request, res: Response) => {
+app.get(['/api', '/api/'], (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     service: 'PayPulse Unified API',
     timestamp: new Date().toISOString(),
     employeeCount: db.employees.length,
     userCount: db.users.length,
+  });
+});
+
+// GET: Backend Health & Status Telemetry
+app.get('/api/health', (_req: Request, res: Response) => {
+  loadDatabase();
+  res.json({
+    success: true,
+    status: 'online',
+    timestamp: new Date().toISOString(),
+    uptime: Math.floor(process.uptime()),
+    database: 'connected',
+    records: {
+      employees: db.employees.length,
+      approvals: db.approvals.length,
+      milestones: db.milestones.length,
+      discrepancies: db.discrepancies.length,
+      users: db.users.length,
+    },
+    version: '2.5',
+    environment: isVercel ? 'vercel-serverless' : 'node-express',
   });
 });
 
