@@ -12,6 +12,7 @@ import React, { useState } from 'react';
 import { ApprovalItem, MilestoneEvent, NavigationTab, EmployeeRow, UserProfile } from '../types';
 import { exportReconciliationLedger } from '../utils/downloadUtils';
 import { INITIAL_EMPLOYEES } from '../data/payrollData';
+import Button from './Button';
 
 /* ========================================================================== */
 /* 1. TYPES & PROPS                                                           */
@@ -72,10 +73,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         <div className="absolute right-32 -bottom-20 w-80 h-80 rounded-full bg-gradient-to-tr from-[#172554]/20 via-[#808dc2]/15 to-transparent blur-2xl pointer-events-none animate-ambient-glow" style={{ animationDelay: '-5s' }}></div>
 
         <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-5">
-          <div>
+          <div className="flex items-center gap-4 flex-wrap">
             <h1 className="font-['Plus_Jakarta_Sans'] text-2xl lg:text-[1.75rem] text-[#131b2e] font-bold tracking-tight">
               {getGreeting()}, {displayName}
             </h1>
+            <Button />
           </div>
 
 
