@@ -1,23 +1,42 @@
-// src/components/Button.tsx
 import React from 'react';
 
 interface ButtonProps {
-  /** Optional CSS class name (unused in the dummy version) */
   className?: string;
-  /** Click handler – kept for API compatibility */
   onClick?: () => void;
 }
 
-/**
- * Dummy button component.
- *
- * This placeholder renders nothing (`null`) so it has **no visual effect** on the UI.
- * Keeping the component (instead of deleting the file) avoids import errors
- * if anything still references `Button`.
- */
 export const Button: React.FC<ButtonProps> = ({ className, onClick }) => {
-  // No UI – just a stub
-  return null;
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={className}
+      style={{
+        background: '#166534',
+        color: 'white',
+        border: 'none',
+        borderRadius: '999px',
+        padding: '10px 18px',
+        fontSize: '14px',
+        fontWeight: 600,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '8px',
+        cursor: 'pointer',
+      }}
+    >
+      <span
+        style={{
+          width: '9px',
+          height: '9px',
+          background: '#4ADE80',
+          borderRadius: '50%',
+          display: 'inline-block',
+        }}
+      />
+      Backend Online
+    </button>
+  );
 };
 
 export default Button;
